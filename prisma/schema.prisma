@@ -3,8 +3,9 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
-  url      = env("DATABASE_URL")
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
 }
 
 model User {
@@ -23,8 +24,8 @@ model Therian {
   speciesId    String
   rarity       String
   seed         String
-  appearance   String
-  stats        String
+  appearance   String   @db.Text
+  stats        String   @db.Text
   traitId      String
   level        Int         @default(1)
   xp           Int         @default(0)
@@ -38,7 +39,7 @@ model ActionLog {
   therianId  String
   therian    Therian  @relation(fields: [therianId], references: [id], onDelete: Cascade)
   actionType String
-  delta      String
-  narrative  String
+  delta      String   @db.Text
+  narrative  String   @db.Text
   createdAt  DateTime @default(now())
 }
