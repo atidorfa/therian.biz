@@ -1,0 +1,44 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String    @id @default(uuid())
+  email     String    @unique
+  password  String
+  name      String?
+  createdAt DateTime  @default(now())
+  therian   Therian?
+}
+
+model Therian {
+  id           String      @id @default(uuid())
+  userId       String      @unique
+  user         User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  speciesId    String
+  rarity       String
+  seed         String
+  appearance   String
+  stats        String
+  traitId      String
+  level        Int         @default(1)
+  xp           Int         @default(0)
+  lastActionAt DateTime?
+  createdAt    DateTime    @default(now())
+  actionLogs   ActionLog[]
+}
+
+model ActionLog {
+  id         String   @id @default(uuid())
+  therianId  String
+  therian    Therian  @relation(fields: [therianId], references: [id], onDelete: Cascade)
+  actionType String
+  delta      String
+  narrative  String
+  createdAt  DateTime @default(now())
+}
