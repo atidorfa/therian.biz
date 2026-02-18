@@ -32,6 +32,24 @@ model Therian {
   lastActionAt DateTime?
   createdAt    DateTime    @default(now())
   actionLogs   ActionLog[]
+
+  name        String?   @unique
+  bites       Int       @default(0)
+  lastBiteAt  DateTime?
+
+  battlesAsChallenger BattleLog[] @relation("Challenger")
+  battlesAsTarget     BattleLog[] @relation("Target")
+}
+
+model BattleLog {
+  id           String   @id @default(uuid())
+  challengerId String
+  challenger   Therian  @relation("Challenger", fields: [challengerId], references: [id], onDelete: Cascade)
+  targetId     String
+  target       Therian  @relation("Target", fields: [targetId], references: [id], onDelete: Cascade)
+  winnerId     String
+  rounds       String   @db.Text
+  createdAt    DateTime @default(now())
 }
 
 model ActionLog {

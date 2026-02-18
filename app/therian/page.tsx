@@ -1,3 +1,4 @@
+import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import { getSession } from '@/lib/session'
 import { db } from '@/lib/db'
@@ -36,7 +37,8 @@ export default async function TherianPage() {
       <nav className="relative z-10 border-b border-white/5 bg-[#08080F]/80 backdrop-blur-sm px-6 py-4 flex items-center justify-between">
         <span className="text-xl font-bold gradient-text">FOXI</span>
         <div className="flex items-center gap-4">
-          <span className="text-[#8B84B0] text-sm">{session.user.email}</span>
+          <Link href="/bite" className="text-[#8B84B0] hover:text-white text-sm transition-colors">⚔️ Morder</Link>
+          <Link href="/leaderboard" className="text-[#8B84B0] hover:text-white text-sm transition-colors">🏆 Top</Link>
           <SignOutButton/>
         </div>
       </nav>

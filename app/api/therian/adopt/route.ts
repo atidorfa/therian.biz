@@ -3,6 +3,7 @@ import { getSession } from '@/lib/session'
 import { db } from '@/lib/db'
 import { generateTherian } from '@/lib/generation/engine'
 import { toTherianDTO } from '@/lib/therian-dto'
+import { assignUniqueName } from '@/lib/catalogs/names'
 
 export async function POST() {
   const session = await getSession()
@@ -20,6 +21,7 @@ export async function POST() {
 
   const secret = process.env.SERVER_SECRET ?? 'default-secret'
   const generated = generateTherian(session.user.id, secret)
+  const uniqueName = await assignUniqueName(db)
 
   const therian = await db.therian.create({
     data: {
@@ -32,6 +34,7 @@ export async function POST() {
       traitId:    generated.traitId,
       level:      1,
       xp:         0,
+      name:       uniqueName,
     },
   })
 

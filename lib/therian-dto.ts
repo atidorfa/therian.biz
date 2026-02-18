@@ -24,8 +24,16 @@ export function toTherianDTO(therian: Therian) {
     ? new Date(new Date(lastActionAt).getTime() + COOLDOWN_MS).toISOString()
     : null
 
+  const lastBiteAt = therian.lastBiteAt
+  const canBite = !lastBiteAt || (now - new Date(lastBiteAt).getTime() > COOLDOWN_MS)
+  const nextBiteAt = lastBiteAt
+    ? new Date(new Date(lastBiteAt).getTime() + COOLDOWN_MS).toISOString()
+    : null
+
   return {
     id: therian.id,
+    name: therian.name ?? null,
+    bites: therian.bites,
     species: species
       ? { id: species.id, name: species.name, emoji: species.emoji, lore: species.lore }
       : { id: therian.speciesId, name: therian.speciesId, emoji: '?', lore: '' },
@@ -49,6 +57,8 @@ export function toTherianDTO(therian: Therian) {
     lastActionAt: lastActionAt ? lastActionAt.toISOString() : null,
     canAct,
     nextActionAt,
+    canBite,
+    nextBiteAt,
     createdAt: therian.createdAt.toISOString(),
   }
 }

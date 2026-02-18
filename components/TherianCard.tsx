@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import Link from 'next/link'
 import type { TherianDTO } from '@/lib/therian-dto'
 import TherianAvatar from './TherianAvatar'
 import StatBar from './StatBar'
@@ -87,12 +88,34 @@ export default function TherianCard({ therian: initialTherian }: Props) {
         {/* Header */}
         <div className="flex items-start justify-between">
           <div>
+            {therian.name && (
+              <p className="text-[#8B84B0] text-xs uppercase tracking-widest mb-0.5">{therian.name}</p>
+            )}
             <h2 className="text-2xl font-bold text-white">
               {therian.species.emoji} {therian.species.name}
             </h2>
-            <p className="text-[#8B84B0] text-sm mt-0.5">Nivel {therian.level}</p>
+            <div className="flex items-center gap-3 mt-0.5">
+              <p className="text-[#8B84B0] text-sm">Nivel {therian.level}</p>
+              <p className="text-[#8B84B0] text-sm">🦷 {therian.bites} mordidas</p>
+            </div>
           </div>
           <RarityBadge rarity={therian.rarity} />
+        </div>
+
+        {/* Battle nav links */}
+        <div className="flex gap-2">
+          <Link
+            href="/bite"
+            className="flex-1 text-center py-2 rounded-lg border border-red-500/20 bg-red-500/5 text-red-300 hover:bg-red-500/10 text-sm font-semibold transition-colors"
+          >
+            ⚔️ Morder
+          </Link>
+          <Link
+            href="/leaderboard"
+            className="flex-1 text-center py-2 rounded-lg border border-amber-500/20 bg-amber-500/5 text-amber-300 hover:bg-amber-500/10 text-sm font-semibold transition-colors"
+          >
+            🏆 Leaderboard
+          </Link>
         </div>
 
         {/* Avatar */}
