@@ -1,6 +1,9 @@
 import { Resend } from 'resend'
 
-const resend = new Resend(process.env.RESEND_API_KEY)
+// Lazy init — avoids crash at build time when RESEND_API_KEY is not set
+function getResend() {
+  return new Resend(process.env.RESEND_API_KEY)
+}
 
 export async function sendVerificationEmail(to: string, token: string): Promise<void> {
   const baseUrl = process.env.APP_BASE_URL ?? 'http://localhost:3000'
@@ -17,7 +20,7 @@ export async function sendVerificationEmail(to: string, token: string): Promise<
 
   const from = process.env.EMAIL_FROM ?? 'FOXI <noreply@resend.dev>'
 
-  await resend.emails.send({
+  await getResend().emails.send({
     from,
     to,
     subject: 'Verificá tu email — FOXI',
