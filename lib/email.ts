@@ -18,12 +18,12 @@ export async function sendVerificationEmail(to: string, token: string): Promise<
     return
   }
 
-  const from = process.env.EMAIL_FROM ?? 'FOXI <noreply@therian.biz>'
+  const from = process.env.EMAIL_FROM ?? 'therian.biz <noreply@therian.biz>'
 
   await getResend().emails.send({
     from,
     to,
-    subject: 'Verificá tu email — FOXI',
+    subject: 'Verificá tu email — therian.biz',
     html: buildEmailHtml(verifyUrl),
   })
 }
@@ -34,7 +34,7 @@ function buildEmailHtml(verifyUrl: string): string {
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Verificá tu email — FOXI</title>
+  <title>Verificá tu email — therian.biz</title>
 </head>
 <body style="margin:0;padding:0;background:#08080F;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;">
   <table width="100%" cellpadding="0" cellspacing="0" style="background:#08080F;padding:40px 0;">
@@ -46,7 +46,7 @@ function buildEmailHtml(verifyUrl: string): string {
           <tr>
             <td align="center" style="padding:40px 40px 24px;">
               <h1 style="margin:0;font-size:36px;font-weight:900;letter-spacing:-1px;background:linear-gradient(135deg,#a78bfa,#7c3aed);-webkit-background-clip:text;-webkit-text-fill-color:transparent;">
-                FOXI
+                therian.biz
               </h1>
               <p style="margin:8px 0 0;color:#8B84B0;font-size:14px;font-style:italic;">
                 Tu compañero ya existe. Solo falta confirmarlo.
@@ -93,7 +93,7 @@ function buildEmailHtml(verifyUrl: string): string {
             <td style="padding:0 40px 32px;">
               <div style="height:1px;background:rgba(255,255,255,0.05);margin-bottom:24px;"></div>
               <p style="margin:0;color:#4A4468;font-size:12px;text-align:center;">
-                Si no creaste una cuenta en FOXI, ignorá este email.
+                Si no creaste una cuenta en therian.biz, ignorá este email.
               </p>
             </td>
           </tr>

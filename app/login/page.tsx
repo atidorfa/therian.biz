@@ -203,7 +203,7 @@ export default function LoginPage() {
 
       <div className="relative w-full max-w-md mx-4">
         <div className="text-center mb-10">
-          <h1 className="text-5xl font-bold tracking-tight gradient-text mb-2">FOXI</h1>
+          <h1 className="text-5xl font-bold tracking-tight gradient-text mb-2">therian.biz</h1>
           <p className="text-[#8B84B0] text-base italic">Tu compañero ya existe.</p>
         </div>
 

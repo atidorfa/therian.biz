@@ -78,7 +78,7 @@ export default function VerifyPage() {
 
       <div className="relative w-full max-w-sm mx-4">
         <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold tracking-tight gradient-text mb-1">FOXI</h1>
+          <h1 className="text-4xl font-bold tracking-tight gradient-text mb-1">therian.biz</h1>
         </div>
 
         <Suspense fallback={
