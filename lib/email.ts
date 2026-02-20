@@ -7,7 +7,7 @@ function getResend() {
 
 export async function sendVerificationEmail(to: string, token: string): Promise<void> {
   const baseUrl = process.env.APP_BASE_URL ?? 'http://localhost:3000'
-  const verifyUrl = `${baseUrl}/verify?token=${token}`
+  const verifyUrl = `${baseUrl}/api/auth/verify?token=${token}`
 
   // Dev fallback: if no API key configured, just log the URL
   if (!process.env.RESEND_API_KEY) {
