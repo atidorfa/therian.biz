@@ -24,15 +24,15 @@ const PATTERN_DEFS: Record<string, (_primary: string, secondary: string) => Reac
   solid:    () => <></>,
   stripe:   (_p, s) => (
     <>
-      <rect x="80" y="80" width="15" height="140" rx="7" fill={s} opacity="0.5"/>
-      <rect x="105" y="60" width="15" height="160" rx="7" fill={s} opacity="0.3"/>
+      <rect x="80" y="80" width="15" height="140" rx="7" fill={s} opacity="0.0"/>
+      <rect x="105" y="60" width="15" height="160" rx="7" fill={s} opacity="0.0"/>
     </>
   ),
   spot:     (_p, s) => (
     <>
-      <circle cx="100" cy="100" r="18" fill={s} opacity="0.4"/>
-      <circle cx="150" cy="130" r="12" fill={s} opacity="0.35"/>
-      <circle cx="80"  cy="150" r="10" fill={s} opacity="0.3"/>
+      <circle cx="100" cy="100" r="18" fill={s} opacity="0.0"/>
+      <circle cx="150" cy="130" r="12" fill={s} opacity="0.0"/>
+      <circle cx="80"  cy="150" r="10" fill={s} opacity="0.0"/>
     </>
   ),
   gradient: () => <></>,
@@ -41,62 +41,65 @@ const PATTERN_DEFS: Record<string, (_primary: string, secondary: string) => Reac
   ),
   ember:    (_p, s) => (
     <>
-      <ellipse cx="120" cy="200" rx="30" ry="40" fill={s} opacity="0.3"/>
-      <ellipse cx="180" cy="210" rx="20" ry="35" fill={s} opacity="0.25"/>
+      <ellipse cx="120" cy="200" rx="30" ry="40" fill={s} opacity="0.0"/>
+      <ellipse cx="180" cy="210" rx="20" ry="35" fill={s} opacity="0.0"/>
     </>
   ),
   frost:    (_p, s) => (
     <>
-      <line x1="150" y1="80" x2="150" y2="220" stroke={s} strokeWidth="1.5" opacity="0.3"/>
-      <line x1="90"  y1="110" x2="210" y2="190" stroke={s} strokeWidth="1.5" opacity="0.3"/>
-      <line x1="90"  y1="190" x2="210" y2="110" stroke={s} strokeWidth="1.5" opacity="0.3"/>
+      <line x1="150" y1="80" x2="150" y2="220" stroke={s} strokeWidth="1.5" opacity="0.0"/>
+      <line x1="90"  y1="110" x2="210" y2="190" stroke={s} strokeWidth="1.5" opacity="0.0"/>
+      <line x1="90"  y1="190" x2="210" y2="110" stroke={s} strokeWidth="1.5" opacity="0.0"/>
     </>
   ),
   dual:     (_p, s) => (
-    <path d="M150 60 C150 60, 240 150, 150 240 C60 150, 150 60" fill={s} opacity="0.2"/>
+    <path d="M150 60 C150 60, 240 150, 150 240 C60 150, 150 60" fill={s} opacity="0.0"/>
   ),
 }
 
 const SIGNATURE_ELEMENTS: Record<string, (primary: string, accent: string) => React.ReactElement> = {
   tail_long:    (p, a) => (
-    <path d="M195 185 Q250 200 270 240 Q280 260 255 255 Q235 250 220 220 Q205 200 195 185"
-          fill={p} stroke={a} strokeWidth="1" opacity="0.9"/>
+    <path d="M195 190 Q248 206 265 246 Q274 266 250 260 Q230 253 216 222 Q202 202 195 190"
+          fill={p} stroke={a} strokeWidth="1" opacity="0.0"/>
   ),
   tail_fluffy:  (p, a) => (
-    <ellipse cx="220" cy="200" rx="35" ry="25" fill={p} stroke={a} strokeWidth="1" opacity="0.8" transform="rotate(30,220,200)"/>
+    <ellipse cx="218" cy="205" rx="34" ry="24" fill={p} stroke={a} strokeWidth="1" opacity="0.0" transform="rotate(30,218,205)"/>
   ),
   horns_small:  (p, a) => (
     <>
-      <path d="M115 85 Q105 55 110 45 Q118 60 118 85" fill={a} stroke={p} strokeWidth="1"/>
-      <path d="M185 85 Q195 55 190 45 Q182 60 182 85" fill={a} stroke={p} strokeWidth="1"/>
+      <path d="M115 72 Q106 44 112 34 Q120 52 118 76" fill={a} stroke={p} strokeWidth="1"/>
+      <path d="M185 72 Q194 44 188 34 Q180 52 182 76" fill={a} stroke={p} strokeWidth="1"/>
     </>
   ),
   horns_grand:  (p, a) => (
     <>
-      <path d="M110 85 Q85 40 95 20 Q108 45 115 85" fill={a} stroke={p} strokeWidth="1.5"/>
-      <path d="M190 85 Q215 40 205 20 Q192 45 185 85" fill={a} stroke={p} strokeWidth="1.5"/>
+      <path d="M110 74 Q86 32 98 14 Q112 42 116 78" fill={a} stroke={p} strokeWidth="1.5"/>
+      <path d="M190 74 Q214 32 202 14 Q188 42 184 78" fill={a} stroke={p} strokeWidth="1.5"/>
     </>
   ),
   wings_small:  (p, a) => (
     <>
-      <path d="M80 140 Q50 110 55 130 Q60 155 85 155" fill={p} stroke={a} strokeWidth="1" opacity="0.7"/>
-      <path d="M220 140 Q250 110 245 130 Q240 155 215 155" fill={p} stroke={a} strokeWidth="1" opacity="0.7"/>
+      <path d="M78 148 Q48 118 54 138 Q59 162 84 160" fill={p} stroke={a} strokeWidth="1" opacity="0.0"/>
+      <path d="M222 148 Q252 118 246 138 Q241 162 216 160" fill={p} stroke={a} strokeWidth="1" opacity="0.0"/>
     </>
   ),
   mane:         (_p, a) => (
-    <ellipse cx="150" cy="120" rx="55" ry="45" fill={a} opacity="0.35"/>
+    <ellipse cx="150" cy="118" rx="56" ry="46" fill={a} opacity="0.0"/>
   ),
   crown:        (p, a) => (
-    <path d="M115 80 L125 55 L150 70 L175 55 L185 80 L165 75 L150 65 L135 75 Z"
+    <path d="M116 72 L126 48 L150 62 L174 48 L184 72 L165 68 L150 58 L135 68 Z"
           fill={a} stroke={p} strokeWidth="1.5"/>
   ),
   no_signature: () => <></>,
 }
 
-const BODY_SHAPE = "M150,90 C120,90 95,110 90,140 C85,165 88,200 95,215 C105,235 125,245 150,245 C175,245 195,235 205,215 C212,200 215,165 210,140 C205,110 180,90 150,90 Z"
-const HEAD_SHAPE = "M150,55 C125,55 105,70 100,88 C96,103 98,120 108,130 C118,140 133,145 150,145 C167,145 182,140 192,130 C202,120 204,103 200,88 C195,70 175,55 150,55 Z"
-const EAR_L = "M108 78 Q100 45 118 38 Q128 60 115 82 Z"
-const EAR_R = "M192 78 Q200 45 182 38 Q172 60 185 82 Z"
+// viewBox 300×300 — proporciones chibi
+// Cabeza: ellipse cx=150, cy=110, rx=80, ry=78 → top y=32, bottom y=188
+// Cuerpo pequeño debajo, brazos como nubs, patas cortas y rechonchas
+const EAR_L = "M104,76 Q96,40 118,28 Q133,56 120,80 Z"
+const EAR_R = "M196,76 Q204,40 182,28 Q167,56 180,80 Z"
+
+// Patas con rotación en render (mismo ángulo que brazos)
 
 export default function TherianAvatar({ therian, size = 300, animated = false }: Props) {
   const { appearance } = therian
@@ -106,6 +109,7 @@ export default function TherianAvatar({ therian, size = 300, animated = false }:
   const SignatureEl = SIGNATURE_ELEMENTS[appearance.signature] ?? SIGNATURE_ELEMENTS.no_signature
 
   const isGradient = appearance.pattern === 'gradient'
+  const fill = isGradient ? 'url(#bodyGrad)' : primary
 
   return (
     <svg
@@ -132,34 +136,53 @@ export default function TherianAvatar({ therian, size = 300, animated = false }:
         )}
       </defs>
 
+      {/* Sombra del suelo */}
+      <ellipse cx="150" cy="278" rx="48" ry="8" fill={primary} opacity="0.2"/>
+
       {/* Signature (detrás del cuerpo) */}
       {SignatureEl(primary, accent)}
 
-      {/* Cuerpo */}
-      <path d={BODY_SHAPE} fill={isGradient ? 'url(#bodyGrad)' : primary}/>
+      {/* Patas — mismo ángulo que brazos (30°), pivote en base del cuerpo */}
+      <g transform="translate(135,243) rotate(10)">
+        <path d="M-9,-5 L9,-5 L9,32 Q9,40 0,40 Q-9,40 -9,32 Z" fill={fill}/>
+      </g>
+      <g transform="translate(165,243) rotate(-10)">
+        <path d="M-9,-5 L9,-5 L9,32 Q9,40 0,40 Q-9,40 -9,32 Z" fill={fill}/>
+      </g>
+
+      {/* Brazos — pivote en la esquina superior del cuerpo, top extendido para cubrir unión */}
+      <g transform="translate(128,185) rotate(30)">
+        <path d="M-9,-8 L9,-8 L9,52 Q9,60 0,60 Q-9,60 -9,52 Z" fill={fill}/>
+      </g>
+      <g transform="translate(172,185) rotate(-30)">
+        <path d="M-9,-8 L9,-8 L9,52 Q9,60 0,60 Q-9,60 -9,52 Z" fill={fill}/>
+      </g>
+
+      {/* Cuerpo — parte superior estrecha con diagonales, base recta */}
+      <path d="M128,185 L172,185 L187,210 L187,237 Q187,245 179,245 L121,245 Q113,245 113,237 L113,210 Z" fill={fill}/>
 
       {/* Patrón sobre cuerpo */}
       {PatternEl(primary, secondary)}
 
-      {/* Orejas */}
-      <path d={EAR_L} fill={primary} stroke={accent} strokeWidth="1"/>
-      <path d={EAR_R} fill={primary} stroke={accent} strokeWidth="1"/>
-      <path d="M110 76 Q103 50 118 42 Q125 58 116 79 Z" fill={secondary} opacity="0.6"/>
-      <path d="M190 76 Q197 50 182 42 Q175 58 184 79 Z" fill={secondary} opacity="0.6"/>
+      {/* Orejas — dibujadas antes de la cabeza, la cabeza cubre la base */}
+      <path d={EAR_L} fill={fill} stroke={accent} strokeWidth="1"/>
+      <path d={EAR_R} fill={fill} stroke={accent} strokeWidth="1"/>
+      <path d="M106,73 Q99,45 118,32 Q129,56 119,77 Z" fill={secondary} opacity="0.6"/>
+      <path d="M194,73 Q201,45 182,32 Q171,56 181,77 Z" fill={secondary} opacity="0.6"/>
 
-      {/* Cabeza */}
-      <path d={HEAD_SHAPE} fill={isGradient ? 'url(#bodyGrad)' : primary}/>
+      {/* Cabeza — elipse aplastada (círculo aplastado) */}
+      <ellipse cx="150" cy="128" rx="77" ry="57" fill={fill}/>
 
       {/* Nariz */}
-      <ellipse cx="150" cy="120" rx="8" ry="5" fill={accent} opacity="0.9"/>
+      <ellipse cx="150" cy="130" rx="7" ry="5" fill={accent} opacity="0.85"/>
 
       {/* Ojos */}
-      <g transform="translate(120, 103)">
+      <g transform="translate(120, 112)">
         <path d={eyeShape} fill={accent}
               filter={therian.rarity === 'LEGENDARY' ? 'url(#legendary-glow)' : undefined}/>
         <circle cx="0" cy="0" r="2" fill="white" opacity="0.8"/>
       </g>
-      <g transform="translate(180, 103)">
+      <g transform="translate(180, 112)">
         <path d={eyeShape} fill={accent}
               filter={therian.rarity === 'LEGENDARY' ? 'url(#legendary-glow)' : undefined}/>
         <circle cx="0" cy="0" r="2" fill="white" opacity="0.8"/>
@@ -168,12 +191,12 @@ export default function TherianAvatar({ therian, size = 300, animated = false }:
       {/* Efecto rareza */}
       {therian.rarity === 'LEGENDARY' && (
         <>
-          <circle cx="150" cy="150" r="140" fill="none" stroke={accent} strokeWidth="1" opacity="0.2"/>
-          <circle cx="150" cy="150" r="130" fill="none" stroke={accent} strokeWidth="0.5" opacity="0.15" strokeDasharray="5 8"/>
+          <ellipse cx="150" cy="150" rx="88" ry="120" fill="none" stroke={accent} strokeWidth="1" opacity="0.25"/>
+          <ellipse cx="150" cy="150" rx="82" ry="114" fill="none" stroke={accent} strokeWidth="0.5" opacity="0.15" strokeDasharray="5 8"/>
         </>
       )}
       {therian.rarity === 'EPIC' && (
-        <circle cx="150" cy="150" r="140" fill="none" stroke="#C084FC" strokeWidth="1" opacity="0.15"/>
+        <ellipse cx="150" cy="150" rx="90" ry="122" fill="none" stroke="#C084FC" strokeWidth="1" opacity="0.2"/>
       )}
     </svg>
   )
