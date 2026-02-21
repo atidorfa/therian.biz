@@ -45,6 +45,7 @@ export default function TherianCard({ therian: initialTherian, rank }: Props) {
   const [levelUp, setLevelUp] = useState(false)
   const [showEvolution, setShowEvolution] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [goldEarned, setGoldEarned] = useState<number | null>(null)
   const [showActionPopup, setShowActionPopup] = useState(false)
 
   // Bite popup
@@ -57,6 +58,16 @@ export default function TherianCard({ therian: initialTherian, rank }: Props) {
   const [biting, setBiting] = useState(false)
   const [biteError, setBiteError] = useState<string | null>(null)
   const [battleResult, setBattleResult] = useState<BattleResult | null>(null)
+
+  // Escuchar compras desde NavShopButton
+  useEffect(() => {
+    const handler = (e: Event) => {
+      const updated = (e as CustomEvent).detail
+      if (updated) setTherian(updated)
+    }
+    window.addEventListener('therian-updated', handler)
+    return () => window.removeEventListener('therian-updated', handler)
+  }, [])
 
   // Name editing
   const [editingName, setEditingName] = useState(false)
@@ -152,7 +163,7 @@ export default function TherianCard({ therian: initialTherian, rank }: Props) {
       const res = await fetch('/api/therian/bite', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ target_name: targetTherian.name }),
+        body: JSON.stringify({ target_name: targetTherian.name, therianId: therian.id }),
       })
       const data = await res.json()
       if (!res.ok) {
@@ -172,6 +183,10 @@ export default function TherianCard({ therian: initialTherian, rank }: Props) {
       setBattleResult(data.battle)
       setTherian(data.challenger)
       setBitePhase('fighting')
+      if (data.goldEarned) {
+        setGoldEarned(data.goldEarned)
+        window.dispatchEvent(new CustomEvent('wallet-update'))
+      }
     } catch {
       setBiteError('Error de conexión.')
       setBiting(false)
@@ -202,7 +217,7 @@ export default function TherianCard({ therian: initialTherian, rank }: Props) {
       const res = await fetch('/api/therian/action', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ action_type: actionType }),
+        body: JSON.stringify({ action_type: actionType, therianId: therian.id }),
       })
 
       const data = await res.json()
@@ -221,6 +236,10 @@ export default function TherianCard({ therian: initialTherian, rank }: Props) {
       setNarrative(data.narrative)
       setLastDelta(data.delta)
       if (data.levelUp) setLevelUp(true)
+      if (data.essenciaEarned) {
+        setGoldEarned(data.essenciaEarned)
+        window.dispatchEvent(new CustomEvent('wallet-update'))
+      }
     } catch {
       setError('Error de conexión.')
     }
@@ -346,7 +365,7 @@ export default function TherianCard({ therian: initialTherian, rank }: Props) {
               onClick={() => setShowActionPopup(true)}
               className="rounded-lg border border-emerald-500/30 bg-emerald-500/8 px-3 py-2 text-center hover:bg-emerald-500/15 hover:border-emerald-500/50 transition-colors"
             >
-              <p className="text-emerald-400 text-xs font-semibold leading-none mb-0.5">🌿 Acción</p>
+              <p className="text-emerald-400 text-xs font-semibold leading-none mb-0.5">🌿 Templar</p>
               <p className="text-emerald-400/70 text-xs leading-none">Disponible</p>
             </button>
           ) : (
@@ -354,7 +373,7 @@ export default function TherianCard({ therian: initialTherian, rank }: Props) {
               onClick={() => setShowActionPopup(true)}
               className="group rounded-lg border border-white/5 bg-white/3 px-3 py-2 text-center hover:bg-white/5 transition-colors"
             >
-              <p className="text-white/30 text-xs font-semibold leading-none mb-0.5">🌿 Acción</p>
+              <p className="text-white/30 text-xs font-semibold leading-none mb-0.5">🌿 Templar</p>
               <p className="text-white/50 text-xs leading-none group-hover:hidden">
                 {therian.nextActionAt
                   ? new Date(therian.nextActionAt).toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' })
@@ -608,6 +627,13 @@ export default function TherianCard({ therian: initialTherian, rank }: Props) {
             )}
 
             {/* Result actions */}
+            {bitePhase === 'result' && goldEarned !== null && (
+              <div className="flex items-center justify-center gap-1.5 rounded-xl border border-amber-500/20 bg-amber-500/5 px-4 py-2 text-amber-400 text-sm font-semibold">
+                <span>🪙</span>
+                <span>+{goldEarned} GOLD</span>
+              </div>
+            )}
+
             {bitePhase === 'result' && (
               <div className="flex gap-2">
                 <button
@@ -639,7 +665,7 @@ export default function TherianCard({ therian: initialTherian, rank }: Props) {
             onClick={e => e.stopPropagation()}
           >
             <div className="flex items-center justify-between">
-              <h3 className="text-white font-semibold text-sm uppercase tracking-widest">Acción del día</h3>
+              <h3 className="text-white font-semibold text-sm uppercase tracking-widest">Templar el espíritu</h3>
               <button
                 onClick={() => setShowActionPopup(false)}
                 className="text-white/30 hover:text-white/70 text-lg leading-none transition-colors"
@@ -651,6 +677,13 @@ export default function TherianCard({ therian: initialTherian, rank }: Props) {
             <DailyActionButtons therian={therian} onAction={handleAction} />
 
             {narrative && <FlavorText text={narrative} key={narrative} />}
+
+            {goldEarned !== null && (
+              <div className="flex items-center justify-center gap-1.5 rounded-xl border border-amber-500/20 bg-amber-500/5 px-4 py-2 text-amber-400 text-sm font-semibold">
+                <span>🪙</span>
+                <span>+{goldEarned} GOLD</span>
+              </div>
+            )}
 
             {error && (
               <div className="rounded-xl border border-red-500/20 bg-red-500/5 px-4 py-3 text-red-300 text-sm text-center italic">
@@ -667,6 +700,7 @@ export default function TherianCard({ therian: initialTherian, rank }: Props) {
           </div>
         </div>
       )}
+
     </div>
   )
 }
