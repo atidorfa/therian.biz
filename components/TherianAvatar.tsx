@@ -93,6 +93,29 @@ const SIGNATURE_ELEMENTS: Record<string, (primary: string, accent: string) => Re
   no_signature: () => <></>,
 }
 
+type PaletteColors = { primary: string; secondary: string; accent: string }
+
+const ACCESSORY_RENDERERS: Record<string, (c: PaletteColors) => React.ReactNode> = {
+  glasses: ({ accent }) => (
+    <g stroke={accent} strokeWidth="3.5" fill="none" opacity="0.92">
+      <circle cx="125" cy="105" r="17" />
+      <circle cx="175" cy="105" r="17" />
+      <line x1="142" y1="105" x2="158" y2="105" />
+      <line x1="108" y1="103" x2="97"  y2="106" />
+      <line x1="192" y1="103" x2="203" y2="106" />
+    </g>
+  ),
+  crown: ({ accent, secondary }) => (
+    <g>
+      <polygon points="150,46 131,68 150,60 169,68" fill={accent} stroke={secondary} strokeWidth="1.5" opacity="0.95"/>
+      <rect x="129" y="67" width="42" height="9" rx="2" fill={accent} opacity="0.85"/>
+      <circle cx="150" cy="46" r="3" fill={secondary} opacity="0.9"/>
+      <circle cx="131" cy="68" r="2.5" fill={secondary} opacity="0.9"/>
+      <circle cx="169" cy="68" r="2.5" fill={secondary} opacity="0.9"/>
+    </g>
+  ),
+}
+
 const BODY_SHAPE = "M150,90 C120,90 95,110 90,140 C85,165 88,200 95,215 C105,235 125,245 150,245 C175,245 195,235 205,215 C212,200 215,165 210,140 C205,110 180,90 150,90 Z"
 const HEAD_SHAPE = "M150,55 C125,55 105,70 100,88 C96,103 98,120 108,130 C118,140 133,145 150,145 C167,145 182,140 192,130 C202,120 204,103 200,88 C195,70 175,55 150,55 Z"
 const EAR_L = "M108 78 Q100 45 118 38 Q128 60 115 82 Z"
@@ -164,6 +187,13 @@ export default function TherianAvatar({ therian, size = 300, animated = false }:
               filter={therian.rarity === 'LEGENDARY' ? 'url(#legendary-glow)' : undefined}/>
         <circle cx="0" cy="0" r="2" fill="white" opacity="0.8"/>
       </g>
+
+      {/* Accesorios */}
+      {therian.accessories?.map(id => (
+        <React.Fragment key={id}>
+          {ACCESSORY_RENDERERS[id]?.({ primary, secondary, accent })}
+        </React.Fragment>
+      ))}
 
       {/* Efecto rareza */}
       {therian.rarity === 'LEGENDARY' && (
