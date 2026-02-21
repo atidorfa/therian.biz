@@ -22,95 +22,102 @@ const EYE_SHAPES: Record<string, string> = {
   star:    'M0,-7 L2,-2 L7,-2 L3,1 L5,6 L0,3 L-5,6 L-3,1 L-7,-2 L-2,-2 Z',
 }
 
-// Patterns adjusted for chibi body (compact, centered ~150,216)
+// Patterns fitted to new compact body (x=124–176, y=178–226)
 const PATTERN_DEFS: Record<string, (_p: string, s: string) => React.ReactElement> = {
   solid:    () => <></>,
   stripe:   (_p, s) => (
     <>
-      <rect x="122" y="182" width="12" height="68" rx="6" fill={s} opacity="0.5"/>
-      <rect x="143" y="178" width="12" height="74" rx="6" fill={s} opacity="0.3"/>
+      <rect x="126" y="181" width="11" height="40" rx="5" fill={s} opacity="0.5"/>
+      <rect x="145" y="179" width="11" height="44" rx="5" fill={s} opacity="0.3"/>
     </>
   ),
   spot:     (_p, s) => (
     <>
-      <circle cx="138" cy="208" r="13" fill={s} opacity="0.4"/>
-      <circle cx="165" cy="230" r="9"  fill={s} opacity="0.35"/>
-      <circle cx="126" cy="234" r="8"  fill={s} opacity="0.3"/>
+      <circle cx="140" cy="198" r="10" fill={s} opacity="0.4"/>
+      <circle cx="162" cy="214" r="7"  fill={s} opacity="0.35"/>
+      <circle cx="130" cy="216" r="6"  fill={s} opacity="0.3"/>
     </>
   ),
   gradient: () => <></>,
   void:     (_p, _s) => (
-    <rect x="114" y="178" width="72" height="74" rx="36" fill="url(#voidGrad)" opacity="0.15"/>
+    <rect x="124" y="178" width="52" height="48" rx="24" fill="url(#voidGrad)" opacity="0.15"/>
   ),
   ember:    (_p, s) => (
     <>
-      <ellipse cx="138" cy="242" rx="22" ry="14" fill={s} opacity="0.3"/>
-      <ellipse cx="167" cy="246" rx="14" ry="10" fill={s} opacity="0.25"/>
+      <ellipse cx="138" cy="220" rx="16" ry="10" fill={s} opacity="0.3"/>
+      <ellipse cx="162" cy="218" rx="10" ry="7"  fill={s} opacity="0.25"/>
     </>
   ),
   frost:    (_p, s) => (
     <>
-      <line x1="150" y1="180" x2="150" y2="252" stroke={s} strokeWidth="1.5" opacity="0.3"/>
-      <line x1="114" y1="208" x2="186" y2="236" stroke={s} strokeWidth="1.5" opacity="0.3"/>
-      <line x1="114" y1="236" x2="186" y2="208" stroke={s} strokeWidth="1.5" opacity="0.3"/>
+      <line x1="150" y1="180" x2="150" y2="224" stroke={s} strokeWidth="1.5" opacity="0.3"/>
+      <line x1="124" y1="196" x2="176" y2="212" stroke={s} strokeWidth="1.5" opacity="0.3"/>
+      <line x1="124" y1="212" x2="176" y2="196" stroke={s} strokeWidth="1.5" opacity="0.3"/>
     </>
   ),
   dual:     (_p, s) => (
-    <path d="M150 178 C150 178, 186 220, 150 254 C114 220, 150 178" fill={s} opacity="0.2"/>
+    <path d="M150 178 C150 178,176 202,150 226 C124 202,150 178" fill={s} opacity="0.2"/>
   ),
 }
 
-// Signature elements adjusted for chibi proportions
-// Head: ellipse cx=150 cy=103 rx=68 ry=78  (top y≈25, bottom y≈181)
-// Body: y≈178 to y≈252
+// Signatures — head: cx=150 cy=100 rx=82 ry=76 (top≈24), body: y≈178–226
 const SIGNATURE_ELEMENTS: Record<string, (p: string, a: string) => React.ReactElement> = {
   tail_long:    (p, a) => (
-    <path d="M186 214 Q240 232 260 270 Q270 290 246 284 Q226 278 208 246 Q192 224 186 214"
+    <path d="M178 210 Q232 228 252 264 Q262 282 238 276 Q218 270 200 240 Q184 218 178 210"
           fill={p} stroke={a} strokeWidth="1" opacity="0.9"/>
   ),
   tail_fluffy:  (p, a) => (
-    <ellipse cx="216" cy="224" rx="33" ry="24" fill={p} stroke={a} strokeWidth="1" opacity="0.8"
-             transform="rotate(28,216,224)"/>
+    <ellipse cx="212" cy="218" rx="32" ry="23" fill={p} stroke={a} strokeWidth="1" opacity="0.8"
+             transform="rotate(28,212,218)"/>
   ),
   horns_small:  (p, a) => (
     <>
-      <path d="M113 84 Q102 50 110 34 Q122 56 118 86" fill={a} stroke={p} strokeWidth="1"/>
-      <path d="M187 84 Q198 50 190 34 Q178 56 182 86" fill={a} stroke={p} strokeWidth="1"/>
+      <path d="M116 84 Q106 48 114 32 Q126 56 122 88" fill={a} stroke={p} strokeWidth="1"/>
+      <path d="M184 84 Q194 48 186 32 Q174 56 178 88" fill={a} stroke={p} strokeWidth="1"/>
     </>
   ),
   horns_grand:  (p, a) => (
     <>
-      <path d="M108 82 Q80 36 94 14 Q110 46 116 86" fill={a} stroke={p} strokeWidth="1.5"/>
-      <path d="M192 82 Q220 36 206 14 Q190 46 184 86" fill={a} stroke={p} strokeWidth="1.5"/>
+      <path d="M110 82 Q84 36 98 14 Q114 48 118 86" fill={a} stroke={p} strokeWidth="1.5"/>
+      <path d="M190 82 Q216 36 202 14 Q186 48 182 86" fill={a} stroke={p} strokeWidth="1.5"/>
     </>
   ),
   wings_small:  (p, a) => (
     <>
-      <path d="M110 204 Q76 178 80 198 Q84 222 113 218" fill={p} stroke={a} strokeWidth="1" opacity="0.7"/>
-      <path d="M190 204 Q224 178 220 198 Q216 222 187 218" fill={p} stroke={a} strokeWidth="1" opacity="0.7"/>
+      <path d="M122 196 Q88 172 92 192 Q96 214 124 210" fill={p} stroke={a} strokeWidth="1" opacity="0.7"/>
+      <path d="M178 196 Q212 172 208 192 Q204 214 176 210" fill={p} stroke={a} strokeWidth="1" opacity="0.7"/>
     </>
   ),
   mane:         (_p, a) => (
-    <ellipse cx="150" cy="130" rx="60" ry="52" fill={a} opacity="0.35"/>
+    <ellipse cx="150" cy="128" rx="58" ry="50" fill={a} opacity="0.35"/>
   ),
   crown:        (p, a) => (
-    <path d="M113 74 L124 46 L150 62 L176 46 L187 74 L168 68 L150 58 L132 68 Z"
+    <path d="M116 74 L126 46 L150 62 L174 46 L184 74 L166 68 L150 58 L134 68 Z"
           fill={a} stroke={p} strokeWidth="1.5"/>
   ),
   no_signature: () => <></>,
 }
 
-// Ear paths for big egg head (cx=150, cy=103, rx=68, ry=78)
-const EAR_L = "M102,86 Q90,46 116,30 Q132,58 115,88 Z"
-const EAR_R = "M198,86 Q210,46 184,30 Q168,58 185,88 Z"
+// ── Layout reference ─────────────────────────────────────────────────────────
+// Head :  ellipse cx=150 cy=100 rx=82 ry=76  →  top y=24, bottom y=176
+// Body :  rect x=124 y=177 w=52 h=48 rx=22   →  pill shape, 52×48 px
+// Ears :  tall rabbit ears towering above head
+// Arms :  simple straight ovals from shoulder pivot (top edge = pivot)
+// Legs :  simple straight ovals from hip pivot (top edge = pivot)
+// Feet :  slightly wider ovals at leg bottoms
+// ─────────────────────────────────────────────────────────────────────────────
 
-// Arm pivots — at shoulder junction of body sides
-const L_ARM_PX = 112, L_ARM_PY = 184
-const R_ARM_PX = 188, R_ARM_PY = 184
+const EAR_L = "M76,96 Q56,16 104,0 Q144,46 112,100 Z"
+const EAR_R = "M224,96 Q244,16 196,0 Q156,46 188,100 Z"
 
-// Leg pivots — at bottom hip of body
-const L_LEG_PX = 133, L_LEG_PY = 250
-const R_LEG_PX = 167, R_LEG_PY = 250
+// Arm pivots — top of arm ellipse = pivot point
+// Arms centered slightly outside body (natural hang from shoulder)
+const L_ARM_PX = 122, L_ARM_PY = 183   // left shoulder
+const R_ARM_PX = 178, R_ARM_PY = 183   // right shoulder
+
+// Leg pivots — top of leg ellipse = pivot point
+const L_LEG_PX = 138, L_LEG_PY = 223   // left hip
+const R_LEG_PX = 162, R_LEG_PY = 223   // right hip
 
 function pivotTransform(px: number, py: number, angle: number): string {
   return `translate(${px} ${py}) rotate(${angle.toFixed(2)}) translate(${-px} ${-py})`
@@ -165,14 +172,12 @@ export default function TherianAvatarChibi({
       const sinP = Math.sin(phase)
 
       if (jumping) {
-        // Jump pose: arms raised, legs tucked
         lArmRef.current?.setAttribute('transform', pivotTransform(L_ARM_PX, L_ARM_PY, -28))
         rArmRef.current?.setAttribute('transform', pivotTransform(R_ARM_PX, R_ARM_PY,  28))
         lLegRef.current?.setAttribute('transform', pivotTransform(L_LEG_PX, L_LEG_PY,  20))
         rLegRef.current?.setAttribute('transform', pivotTransform(R_LEG_PX, R_LEG_PY, -20))
         bodyBobRef.current?.setAttribute('transform', 'translate(0 0)')
       } else if (walking) {
-        // Walk: arms ±22°, legs ±26° opposite phase, 0.55s cycle
         lArmRef.current?.setAttribute('transform', pivotTransform(L_ARM_PX, L_ARM_PY,  sinP * 22))
         rArmRef.current?.setAttribute('transform', pivotTransform(R_ARM_PX, R_ARM_PY, -sinP * 22))
         lLegRef.current?.setAttribute('transform', pivotTransform(L_LEG_PX, L_LEG_PY, -sinP * 26))
@@ -180,7 +185,6 @@ export default function TherianAvatarChibi({
         const bob = -Math.abs(sinP) * 4
         bodyBobRef.current?.setAttribute('transform', `translate(0 ${bob.toFixed(2)})`)
       } else {
-        // Idle: gentle arm sway ±4°, breathe ±1.5px, 3s cycle
         const armSway = sinP * 4
         lArmRef.current?.setAttribute('transform', pivotTransform(L_ARM_PX, L_ARM_PY,  armSway))
         rArmRef.current?.setAttribute('transform', pivotTransform(R_ARM_PX, R_ARM_PY, -armSway))
@@ -222,69 +226,64 @@ export default function TherianAvatarChibi({
         )}
       </defs>
 
-      {/* Ground shadow — outside bob group, stays still */}
-      <ellipse cx="150" cy="293" rx="50" ry="7" fill={primary} opacity="0.2"/>
+      {/* Ground shadow */}
+      <ellipse cx="150" cy="278" rx="46" ry="7" fill={primary} opacity="0.2"/>
 
       <g ref={bodyBobRef}>
 
-        {/* ── Arms (behind body) ──
-            Pivot: shoulder point. Arm hangs from pivot, round hand at bottom. */}
+        {/* ── Arms — simple straight ovals, pivot at shoulder top ── */}
         <g ref={lArmRef}>
-          {/* Arm body — top edge at pivot (y=184) */}
-          <ellipse cx={L_ARM_PX} cy="215" rx="13" ry="31" fill={fill}/>
-          {/* Round hand */}
-          <circle cx="105" cy="250" r="14" fill={secondary} opacity="0.92"/>
+          {/* Arm oval: top edge at pivot y=183, 12px left of pivot x */}
+          <ellipse cx="110" cy="212" rx="13" ry="29" fill={fill}/>
+          {/* Paw — slightly wider rounded end */}
+          <ellipse cx="109" cy="240" rx="14" ry="10" fill={secondary} opacity="0.88"/>
         </g>
         <g ref={rArmRef}>
-          <ellipse cx={R_ARM_PX} cy="215" rx="13" ry="31" fill={fill}/>
-          <circle cx="195" cy="250" r="14" fill={secondary} opacity="0.92"/>
+          <ellipse cx="190" cy="212" rx="13" ry="29" fill={fill}/>
+          <ellipse cx="191" cy="240" rx="14" ry="10" fill={secondary} opacity="0.88"/>
         </g>
 
-        {/* ── Legs ──
-            Pivot: hip point. Leg hangs from pivot, oval foot at bottom. */}
+        {/* ── Legs — short straight ovals, pivot at hip bottom ── */}
         <g ref={lLegRef}>
-          {/* Leg body — top edge at pivot (y=250) */}
-          <ellipse cx={L_LEG_PX} cy="267" rx="13" ry="17" fill={fill}/>
-          {/* Round foot */}
-          <ellipse cx="127" cy="283" rx="20" ry="10" fill={secondary} opacity="0.92"/>
+          {/* Leg oval: top edge at pivot y=223 */}
+          <ellipse cx="138" cy="243" rx="13" ry="20" fill={fill}/>
+          {/* Foot — wider flat oval */}
+          <ellipse cx="134" cy="261" rx="17" ry="9" fill={secondary} opacity="0.88"/>
         </g>
         <g ref={rLegRef}>
-          <ellipse cx={R_LEG_PX} cy="267" rx="13" ry="17" fill={fill}/>
-          <ellipse cx="173" cy="283" rx="20" ry="10" fill={secondary} opacity="0.92"/>
+          <ellipse cx="162" cy="243" rx="13" ry="20" fill={fill}/>
+          <ellipse cx="166" cy="261" rx="17" ry="9" fill={secondary} opacity="0.88"/>
         </g>
 
         {/* Signature trait (behind body) */}
         {SignatureEl(primary, accent)}
 
-        {/* Body — compact trapezoid, wider at bottom for chibi stability */}
-        <path
-          d="M122,178 L178,178 L186,208 L186,248 Q186,256 176,256 L124,256 Q114,256 114,248 L114,208 Z"
-          fill={fill}
-        />
+        {/* ── Body — small pill/rounded-rect, like in the image ── */}
+        <rect x="124" y="177" width="52" height="48" rx="22" fill={fill}/>
 
-        {/* Body pattern overlay */}
+        {/* Pattern over body */}
         {PatternEl(primary, secondary)}
 
-        {/* Ears — behind head so head covers their base */}
+        {/* ── Ears — tall, behind head ── */}
         <path d={EAR_L} fill={fill} stroke={accent} strokeWidth="1"/>
         <path d={EAR_R} fill={fill} stroke={accent} strokeWidth="1"/>
-        {/* Inner ear highlights */}
-        <path d="M105,82 Q95,50 116,34 Q129,60 114,84 Z" fill={secondary} opacity="0.6"/>
-        <path d="M195,82 Q205,50 184,34 Q171,60 186,84 Z" fill={secondary} opacity="0.6"/>
+        {/* Inner ear */}
+        <path d="M82,92 Q64,20 104,4 Q136,48 110,96 Z" fill={secondary} opacity="0.55"/>
+        <path d="M218,92 Q236,20 196,4 Q164,48 190,96 Z" fill={secondary} opacity="0.55"/>
 
-        {/* Head — big egg/oval, the defining chibi feature */}
-        <ellipse cx="150" cy="103" rx="68" ry="78" fill={fill}/>
+        {/* ── Head — large round oval, defining chibi shape ── */}
+        <ellipse cx="150" cy="100" rx="82" ry="76" fill={fill}/>
 
-        {/* Nose — small, centered */}
-        <ellipse cx="150" cy="122" rx="8" ry="5.5" fill={accent} opacity="0.85"/>
+        {/* Nose */}
+        <ellipse cx="150" cy="118" rx="7" ry="5" fill={accent} opacity="0.85"/>
 
-        {/* Eyes — scaled 1.35× vs normal for big chibi eyes */}
-        <g transform="translate(118, 100) scale(1.35)">
+        {/* Eyes — 1.35× scaled for chibi big-eye look */}
+        <g transform="translate(114, 96) scale(1.35)">
           <path d={eyeShape} fill={accent}
                 filter={therian.rarity === 'LEGENDARY' ? 'url(#legendary-glow)' : undefined}/>
           <circle cx="0" cy="0" r="2.5" fill="white" opacity="0.85"/>
         </g>
-        <g transform="translate(182, 100) scale(1.35)">
+        <g transform="translate(186, 96) scale(1.35)">
           <path d={eyeShape} fill={accent}
                 filter={therian.rarity === 'LEGENDARY' ? 'url(#legendary-glow)' : undefined}/>
           <circle cx="0" cy="0" r="2.5" fill="white" opacity="0.85"/>
@@ -293,12 +292,12 @@ export default function TherianAvatarChibi({
         {/* Rarity aura */}
         {therian.rarity === 'LEGENDARY' && (
           <>
-            <ellipse cx="150" cy="152" rx="90" ry="126" fill="none" stroke={accent} strokeWidth="1" opacity="0.25"/>
-            <ellipse cx="150" cy="152" rx="84" ry="120" fill="none" stroke={accent} strokeWidth="0.5" opacity="0.15" strokeDasharray="5 8"/>
+            <ellipse cx="150" cy="148" rx="92" ry="122" fill="none" stroke={accent} strokeWidth="1" opacity="0.25"/>
+            <ellipse cx="150" cy="148" rx="86" ry="116" fill="none" stroke={accent} strokeWidth="0.5" opacity="0.15" strokeDasharray="5 8"/>
           </>
         )}
         {therian.rarity === 'EPIC' && (
-          <ellipse cx="150" cy="152" rx="92" ry="128" fill="none" stroke="#C084FC" strokeWidth="1" opacity="0.2"/>
+          <ellipse cx="150" cy="148" rx="94" ry="124" fill="none" stroke="#C084FC" strokeWidth="1" opacity="0.2"/>
         )}
 
       </g>
