@@ -387,11 +387,6 @@ export default function TherianCard({ therian: initialTherian, rank }: Props) {
         <div className="flex justify-center">
           <div className="relative">
             <TherianAvatar therian={therian} size={220} animated />
-            {levelUp && (
-              <div className="absolute inset-0 flex items-center justify-center">
-                <span className="text-4xl animate-bounce">⬆️</span>
-              </div>
-            )}
           </div>
         </div>
 
@@ -668,6 +663,7 @@ export default function TherianCard({ therian: initialTherian, rank }: Props) {
                 ✦ ¡Tu Therian alcanzó el nivel {therian.level}! ✦
               </div>
             )}
+
           </div>
         </div>
       )}
