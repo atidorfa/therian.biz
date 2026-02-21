@@ -396,8 +396,6 @@ export default function CasaRoom({ therian }: Props) {
               size={180}
               isWalking={isWalking}
               isJumping={isJumping}
-              facingRight={facingRight}
-              speed={1.0}
             />
           </div>
         )}
