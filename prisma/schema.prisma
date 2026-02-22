@@ -46,6 +46,7 @@ model Therian {
   xp           Int         @default(0)
   lastActionAt DateTime?
   createdAt    DateTime    @default(now())
+  equippedRunes String     @default("[]") @db.Text
   actionLogs   ActionLog[]
 
   name        String?   @unique
@@ -55,6 +56,20 @@ model Therian {
 
   battlesAsChallenger BattleLog[] @relation("Challenger")
   battlesAsTarget     BattleLog[] @relation("Target")
+  runeInventory       RuneInventory[]
+}
+
+model RuneInventory {
+  id         String   @id @default(uuid())
+  therianId  String
+  therian    Therian  @relation(fields: [therianId], references: [id], onDelete: Cascade)
+  runeId     String
+  quantity   Int      @default(1)
+  source     String   @default("unknown") // "action" | "shop" | "battle" | "gift" | "unknown"
+  obtainedAt DateTime @default(now())
+
+  @@unique([therianId, runeId])
+  @@index([therianId])
 }
 
 model BattleLog {
