@@ -102,6 +102,7 @@ export function toTherianDTO(therian: Therian) {
     canBite,
     nextBiteAt,
     equippedAccessories: parseEquippedAccessories(therian.accessories ?? null),
+    equippedAbilities: JSON.parse(therian.equippedAbilities || '[]') as string[],
     status: therian.status,
     createdAt: therian.createdAt.toISOString(),
   }
