@@ -5,7 +5,7 @@ export type EggItem = {
   rarity: string
   description: string
   price: number
-  currency: 'essencia' | 'therianCoin'
+  currency: 'gold' | 'essence'
 }
 
 export const EGGS: EggItem[] = [
@@ -16,7 +16,7 @@ export const EGGS: EggItem[] = [
     rarity: 'COMMON',
     description: 'Sustituye un slot de fusión Común.',
     price: 100,
-    currency: 'essencia',
+    currency: 'gold',
   },
   {
     id: 'egg_uncommon',
@@ -25,7 +25,7 @@ export const EGGS: EggItem[] = [
     rarity: 'UNCOMMON',
     description: 'Sustituye un slot de fusión Poco común.',
     price: 400,
-    currency: 'essencia',
+    currency: 'gold',
   },
   {
     id: 'egg_rare',
@@ -34,7 +34,7 @@ export const EGGS: EggItem[] = [
     rarity: 'RARE',
     description: 'Sustituye un slot de fusión Raro.',
     price: 1500,
-    currency: 'essencia',
+    currency: 'gold',
   },
   {
     id: 'egg_epic',
@@ -43,7 +43,7 @@ export const EGGS: EggItem[] = [
     rarity: 'EPIC',
     description: 'Sustituye un slot de fusión Épico.',
     price: 3,
-    currency: 'therianCoin',
+    currency: 'essence',
   },
   {
     id: 'egg_legendary',
@@ -52,16 +52,7 @@ export const EGGS: EggItem[] = [
     rarity: 'LEGENDARY',
     description: 'Sustituye un slot de fusión Legendario.',
     price: 10,
-    currency: 'therianCoin',
-  },
-  {
-    id: 'egg_mythic',
-    name: 'Huevo Mítico',
-    emoji: '🥚',
-    rarity: 'MYTHIC',
-    description: 'Sustituye un slot de fusión Mítico.',
-    price: 50,
-    currency: 'therianCoin',
+    currency: 'essence',
   },
 ]
 

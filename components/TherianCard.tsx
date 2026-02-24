@@ -62,12 +62,16 @@ export default function TherianCard({ therian: initialTherian, rank }: Props) {
   const [selectedSlot, setSelectedSlot] = useState<number | null>(null)
   const [equipping, setEquipping] = useState(false)
 
-  // Accessories panel (left side)
-  const [showAccessories, setShowAccessories] = useState(false)
+  // Accessories panel (inside runes panel)
   const [selectedAccessorySlot, setSelectedAccessorySlot] = useState<string | null>(null)
   const [equippingAccessory, setEquippingAccessory] = useState(false)
   const [ownedAccessories, setOwnedAccessories] = useState<{ itemId: string; name: string; emoji: string; description: string }[] | null>(null)
   const [loadingAccessories, setLoadingAccessories] = useState(false)
+
+  // Capsule
+  const [capsuling, setCapsuling] = useState(false)
+  const [capsuleError, setCapsuleError] = useState<string | null>(null)
+  const [showCapsuleConfirm, setShowCapsuleConfirm] = useState(false)
 
   // Bite popup
   const [showBitePopup, setShowBitePopup] = useState(false)
@@ -90,43 +94,35 @@ export default function TherianCard({ therian: initialTherian, rank }: Props) {
     return () => window.removeEventListener('therian-updated', handler)
   }, [])
 
+  // Load accessories when the side panel opens (or when inventory changes)
+  const fetchOwnedAccessories = () => {
+    fetch('/api/inventory')
+      .then(r => r.ok ? r.json() : { items: [] })
+      .then(data => {
+        setOwnedAccessories(
+          (data.items ?? [])
+            .filter((i: { type: string }) => i.type === 'ACCESSORY')
+            .map((i: { itemId: string; name: string; emoji: string; description: string }) => ({
+              itemId: i.itemId, name: i.name, emoji: i.emoji, description: i.description,
+            }))
+        )
+        setLoadingAccessories(false)
+      })
+  }
+
+  useEffect(() => {
+    if (showStats && ownedAccessories === null && !loadingAccessories) {
+      setLoadingAccessories(true)
+      fetchOwnedAccessories()
+    }
+  }, [showStats]) // eslint-disable-line react-hooks/exhaustive-deps
+
   // Re-fetch accessories when inventory changes (e.g. after a purchase)
   useEffect(() => {
-    const handler = () => {
-      fetch('/api/inventory')
-        .then(r => r.ok ? r.json() : { items: [] })
-        .then(data => {
-          setOwnedAccessories(
-            (data.items ?? [])
-              .filter((i: { type: string }) => i.type === 'ACCESSORY')
-              .map((i: { itemId: string; name: string; emoji: string; description: string }) => ({
-                itemId: i.itemId, name: i.name, emoji: i.emoji, description: i.description,
-              }))
-          )
-        })
-    }
+    const handler = () => { fetchOwnedAccessories() }
     window.addEventListener('inventory-updated', handler)
     return () => window.removeEventListener('inventory-updated', handler)
-  }, [])
-
-  const openAccessoriesPanel = () => {
-    if (!showAccessories && ownedAccessories === null && !loadingAccessories) {
-      setLoadingAccessories(true)
-      fetch('/api/inventory')
-        .then(r => r.ok ? r.json() : { items: [] })
-        .then(data => {
-          setOwnedAccessories(
-            (data.items ?? [])
-              .filter((i: { type: string }) => i.type === 'ACCESSORY')
-              .map((i: { itemId: string; name: string; emoji: string; description: string }) => ({
-                itemId: i.itemId, name: i.name, emoji: i.emoji, description: i.description,
-              }))
-          )
-          setLoadingAccessories(false)
-        })
-    }
-    setShowAccessories(prev => !prev)
-  }
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleEquipAccessory = async (accessoryId: string | null) => {
     if (!selectedAccessorySlot) return
@@ -291,6 +287,35 @@ export default function TherianCard({ therian: initialTherian, rank }: Props) {
     handleBiteReset()
   }
 
+  const handleCapsule = async () => {
+    setCapsuling(true)
+    setCapsuleError(null)
+    try {
+      const res = await fetch('/api/therian/capsule', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ therianId: therian.id }),
+      })
+      const data = await res.json()
+      if (!res.ok) {
+        if (data.error === 'LAST_ACTIVE_THERIAN') {
+          setCapsuleError('Necesitas al menos un Therian activo.')
+        } else {
+          setCapsuleError('No se pudo capsular. Intenta de nuevo.')
+        }
+        setShowCapsuleConfirm(false)
+        return
+      }
+      setShowCapsuleConfirm(false)
+      window.dispatchEvent(new CustomEvent('therian-capsulated', { detail: { id: therian.id } }))
+    } catch {
+      setCapsuleError('Error de conexión.')
+      setShowCapsuleConfirm(false)
+    } finally {
+      setCapsuling(false)
+    }
+  }
+
   const handleAction = async (actionType: string) => {
     setError(null)
     setNarrative(null)
@@ -363,23 +388,24 @@ export default function TherianCard({ therian: initialTherian, rank }: Props) {
   return (
     <div className="relative w-full z-10 flex text-left font-sans group/card">
 
-      {/* Accessories Panel (LEFT) */}
+      {/* Side Panel: Accesorios + Runas */}
       <div
-        className={`absolute top-[2%] bottom-[2%] left-0 w-[90%] z-0 border-y border-l border-white/10 bg-[#0F0F1A] rounded-l-2xl shadow-xl flex items-center transition-all duration-500 ease-[cubic-bezier(0.34,1.56,0.64,1)] ${
-          showAccessories ? '-translate-x-[95%]' : '-translate-x-[12px]'
+        className={`absolute top-[2%] bottom-[2%] right-0 w-[90%] z-0 border-y border-r border-white/10 bg-[#0F0F1A] rounded-r-2xl shadow-xl flex transition-all duration-500 ease-[cubic-bezier(0.34,1.56,0.64,1)] ${
+          showStats ? 'translate-x-[95%]' : 'translate-x-[12px]'
         }`}
       >
-        <div className={`w-full p-5 pr-10 flex flex-col justify-center space-y-4 transition-opacity duration-300 ${showAccessories ? 'opacity-100 delay-150' : 'opacity-0 pointer-events-none'}`}>
+        <div className={`w-full h-full p-5 pl-10 flex flex-col space-y-3 overflow-y-auto transition-opacity duration-300 ${showStats ? 'opacity-100 delay-150' : 'opacity-0 pointer-events-none'}`}>
+
+          {/* ── Accesorios ── */}
           <h3 className="text-[#8B84B0] text-xs uppercase tracking-widest font-semibold">
             Accesorios
           </h3>
           {loadingAccessories ? (
-            <div className="text-white/20 text-xs text-center py-4">Cargando...</div>
+            <div className="text-white/20 text-xs text-center py-2">Cargando...</div>
           ) : (
             <div className="grid grid-cols-2 gap-2">
               {ACCESSORY_SLOTS.map((slot) => {
                 const equippedAccId = therian.equippedAccessories[slot.id]
-                // instanceId format: "typeId:uuid" (new) or just "typeId" (legacy)
                 const accTypeId = equippedAccId ? (equippedAccId.includes(':') ? equippedAccId.split(':')[0] : equippedAccId) : null
                 const accMeta = accTypeId ? SHOP_ITEMS.find(i => i.accessoryId === accTypeId) : null
                 return (
@@ -402,26 +428,10 @@ export default function TherianCard({ therian: initialTherian, rank }: Props) {
               })}
             </div>
           )}
-        </div>
 
-        {/* Toggle arrow button attached to the left edge */}
-        <button
-          onClick={openAccessoriesPanel}
-          className={`absolute top-1/2 -left-7 -translate-y-1/2 w-7 h-16 bg-[#0F0F1A] border-y border-l border-white/10 rounded-l-xl flex items-center justify-center hover:bg-[#1a1a2e] transition-all text-white/50 hover:text-white cursor-pointer shadow-md z-10 ${!showAccessories && 'group-hover/card:-translate-x-1'}`}
-        >
-          <span className={`transition-transform duration-500 text-[10px] ${showAccessories ? 'rotate-180' : ''}`}>
-            ◀
-          </span>
-        </button>
-      </div>
+          <div className="border-t border-white/5 my-1" />
 
-      {/* Side Stats Panel */}
-      <div 
-        className={`absolute top-[2%] bottom-[2%] right-0 w-[90%] z-0 border-y border-r border-white/10 bg-[#0F0F1A] rounded-r-2xl shadow-xl flex items-center transition-all duration-500 ease-[cubic-bezier(0.34,1.56,0.64,1)] ${
-          showStats ? 'translate-x-[95%]' : 'translate-x-[12px]'
-        }`}
-      >
-        <div className={`w-full p-5 pl-10 flex flex-col justify-center space-y-4 transition-opacity duration-300 ${showStats ? 'opacity-100 delay-150' : 'opacity-0 pointer-events-none'}`}>
+          {/* ── Runas ── */}
           <h3 className="text-[#8B84B0] text-xs uppercase tracking-widest font-semibold">
             Runas
           </h3>
@@ -448,15 +458,16 @@ export default function TherianCard({ therian: initialTherian, rank }: Props) {
               </button>
             ))}
           </div>
+
         </div>
 
         {/* Toggle arrow button attached to the right edge */}
         <button
-           onClick={() => setShowStats(!showStats)}
-           className={`absolute top-1/2 -right-7 -translate-y-1/2 w-7 h-16 bg-[#0F0F1A] border-y border-r border-white/10 rounded-r-xl flex items-center justify-center hover:bg-[#1a1a2e] transition-all text-white/50 hover:text-white cursor-pointer shadow-md z-10 ${!showStats && 'group-hover/card:translate-x-1'}`}
+          onClick={() => setShowStats(!showStats)}
+          className={`absolute top-1/2 -right-7 -translate-y-1/2 w-7 h-16 bg-[#0F0F1A] border-y border-r border-white/10 rounded-r-xl flex items-center justify-center hover:bg-[#1a1a2e] transition-all text-white/50 hover:text-white cursor-pointer shadow-md z-10 ${!showStats && 'group-hover/card:translate-x-1'}`}
         >
           <span className={`transition-transform duration-500 text-[10px] ${showStats ? 'rotate-180' : ''}`}>
-             ▶
+            ▶
           </span>
         </button>
       </div>
@@ -615,7 +626,21 @@ export default function TherianCard({ therian: initialTherian, rank }: Props) {
               <p className="text-white/30 text-xs leading-none">Nivel 2</p>
             </div>
           )}
+
+          {/* Col 2 fila 2: Capsular */}
+          <button
+            onClick={() => { setShowCapsuleConfirm(true); setCapsuleError(null) }}
+            className="rounded-lg border border-indigo-500/20 bg-indigo-500/5 px-3 py-2 text-center hover:bg-indigo-500/12 hover:border-indigo-500/40 transition-colors"
+          >
+            <p className="text-indigo-400/80 text-xs font-semibold leading-none mb-0.5">💊 Capsular</p>
+            <p className="text-indigo-400/40 text-xs leading-none">Guardar</p>
+          </button>
         </div>
+
+        {/* Capsule error inline */}
+        {capsuleError && (
+          <p className="text-red-400 text-xs text-center">{capsuleError}</p>
+        )}
 
         {/* Avatar */}
         <div className="flex justify-center">
@@ -1041,6 +1066,52 @@ export default function TherianCard({ therian: initialTherian, rank }: Props) {
               </div>
             )}
 
+          </div>
+        </div>
+      )}
+
+      {/* Capsule confirmation modal */}
+      {showCapsuleConfirm && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm"
+          onClick={() => !capsuling && setShowCapsuleConfirm(false)}
+        >
+          <div
+            className="bg-[#13131F] border border-white/10 rounded-2xl p-6 w-full max-w-sm space-y-4 shadow-2xl"
+            onClick={e => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between">
+              <h3 className="text-white font-semibold text-sm uppercase tracking-widest">💊 Capsular</h3>
+              <button
+                onClick={() => !capsuling && setShowCapsuleConfirm(false)}
+                className="text-white/30 hover:text-white/70 text-lg leading-none transition-colors"
+              >✕</button>
+            </div>
+            <p className="text-white/60 text-sm text-center">
+              ¿Guardás a <span className="text-white font-semibold">{therian.name ?? therian.species.name}</span> en una cápsula?
+            </p>
+            <p className="text-white/30 text-xs text-center">
+              Podés liberarlo desde el Inventario &rarr; Cápsulas.
+            </p>
+            {capsuleError && (
+              <p className="text-red-400 text-xs text-center">{capsuleError}</p>
+            )}
+            <div className="flex gap-2">
+              <button
+                onClick={() => setShowCapsuleConfirm(false)}
+                disabled={capsuling}
+                className="flex-1 py-2.5 rounded-xl text-sm border border-white/10 text-white/50 hover:text-white hover:border-white/20 transition-colors disabled:opacity-40"
+              >
+                Cancelar
+              </button>
+              <button
+                onClick={handleCapsule}
+                disabled={capsuling}
+                className="flex-1 py-2.5 rounded-xl font-bold text-white text-sm bg-indigo-700 hover:bg-indigo-600 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+              >
+                {capsuling ? 'Guardando...' : '💊 Capsular'}
+              </button>
+            </div>
           </div>
         </div>
       )}

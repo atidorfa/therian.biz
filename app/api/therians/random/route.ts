@@ -8,8 +8,8 @@ export async function GET() {
   const currentUserId = session?.user?.id ?? null
 
   const where = currentUserId
-    ? { userId: { not: currentUserId }, name: { not: null } }
-    : { name: { not: null } }
+    ? { userId: { not: currentUserId }, name: { not: null }, status: 'active' }
+    : { name: { not: null }, status: 'active' }
 
   const count = await db.therian.count({ where })
 

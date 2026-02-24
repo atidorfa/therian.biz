@@ -74,6 +74,29 @@ export default function TherianTabs({ therians, ranks, slots }: Props) {
     return () => window.removeEventListener('therian-updated', handler)
   }, [])
 
+  // Listen for capsulation — remove the therian from local list and switch active
+  useEffect(() => {
+    const handler = (e: Event) => {
+      const { id } = (e as CustomEvent<{ id: string }>).detail
+      setLocalTherians(prev => {
+        const next = prev.filter(t => t.id !== id)
+        return next
+      })
+      setOrder(prev => {
+        const next = prev.filter(capsId => capsId !== id)
+        try { localStorage.setItem(ORDER_KEY, JSON.stringify(next)) } catch {}
+        return next
+      })
+      setActiveId(prev => {
+        if (prev !== id) return prev
+        const remaining = order.filter(oid => oid !== id)
+        return remaining[0] ?? ''
+      })
+    }
+    window.addEventListener('therian-capsulated', handler)
+    return () => window.removeEventListener('therian-capsulated', handler)
+  }, [order])
+
   const saveOrder = useCallback((newOrder: string[]) => {
     setOrder(newOrder)
     try { localStorage.setItem(ORDER_KEY, JSON.stringify(newOrder)) } catch {}

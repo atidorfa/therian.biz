@@ -4,6 +4,7 @@ import { db } from '@/lib/db'
 import { toTherianDTO } from '@/lib/therian-dto'
 import { generateTherianWithRarity, getNextRarity } from '@/lib/generation/engine'
 import { EGG_BY_ID } from '@/lib/items/eggs'
+import { assignUniqueName } from '@/lib/catalogs/names'
 import type { Rarity } from '@/lib/generation/engine'
 
 const FUSION_SUCCESS_RATE: Record<string, number> = {
@@ -102,6 +103,7 @@ export async function POST(req: Request) {
   // Generate and persist the result therian
   const secret = process.env.SERVER_SECRET ?? 'therian-hmac-secret-local'
   const generated = generateTherianWithRarity(session.user.id, secret, resultRarity)
+  const name = await assignUniqueName(db)
 
   const newTherian = await db.therian.create({
     data: {
@@ -112,6 +114,7 @@ export async function POST(req: Request) {
       appearance: JSON.stringify(generated.appearance),
       stats:      JSON.stringify(generated.stats),
       traitId:    generated.traitId,
+      name,
     },
   })
 

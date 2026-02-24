@@ -34,44 +34,51 @@ export async function POST(req: NextRequest) {
 
     const user = await db.user.findUnique({
       where: { id: session.user.id },
-      select: { id: true, essencia: true, therianCoin: true, therianSlots: true },
+      select: { id: true, gold: true, essence: true, therianSlots: true },
     })
     if (!user) return NextResponse.json({ error: 'USER_NOT_FOUND' }, { status: 404 })
 
     // Validate balance
-    if (egg.currency === 'essencia' && user.essencia < totalCost) {
+    if (egg.currency === 'gold' && user.gold < totalCost) {
       return NextResponse.json(
-        { error: 'INSUFFICIENT_ESSENCIA', available: user.essencia, required: totalCost },
+        { error: 'INSUFFICIENT_ESSENCIA', available: user.gold, required: totalCost },
         { status: 400 }
       )
     }
-    if (egg.currency === 'therianCoin' && user.therianCoin < totalCost) {
+    if (egg.currency === 'essence' && user.essence < totalCost) {
       return NextResponse.json(
-        { error: 'INSUFFICIENT_COIN', available: user.therianCoin, required: totalCost },
+        { error: 'INSUFFICIENT_COIN', available: user.essence, required: totalCost },
         { status: 400 }
       )
     }
 
-    // Add egg to inventory
-    await db.inventoryItem.upsert({
-      where: { userId_itemId: { userId: session.user.id, itemId: egg.id } },
-      update: { quantity: { increment: qty } },
-      create: { userId: session.user.id, type: 'EGG', itemId: egg.id, quantity: qty },
-    })
+    // Deduct currency — explicit to avoid silent no-op if currency value is unrecognized
+    let currencyData: { gold?: { decrement: number }; essence?: { decrement: number } }
+    if (egg.currency === 'gold') {
+      currencyData = { gold: { decrement: totalCost } }
+    } else if (egg.currency === 'essence') {
+      currencyData = { essence: { decrement: totalCost } }
+    } else {
+      return NextResponse.json({ error: 'INVALID_EGG_CURRENCY', currency: egg.currency }, { status: 500 })
+    }
 
-    // Deduct currency
-    const updatedUser = await db.user.update({
-      where: { id: session.user.id },
-      data: {
-        ...(egg.currency === 'essencia' ? { essencia: { decrement: totalCost } } : {}),
-        ...(egg.currency === 'therianCoin' ? { therianCoin: { decrement: totalCost } } : {}),
-      },
-      select: { essencia: true, therianCoin: true, therianSlots: true },
-    })
+    // Atomic: inventory + currency in one transaction
+    const [, updatedUser] = await db.$transaction([
+      db.inventoryItem.upsert({
+        where: { userId_itemId: { userId: session.user.id, itemId: egg.id } },
+        update: { quantity: { increment: qty } },
+        create: { userId: session.user.id, type: 'EGG', itemId: egg.id, quantity: qty },
+      }),
+      db.user.update({
+        where: { id: session.user.id },
+        data: currencyData,
+        select: { gold: true, essence: true, therianSlots: true },
+      }),
+    ])
 
     return NextResponse.json({
       success: true,
-      newBalance: { essencia: updatedUser.essencia, therianCoin: updatedUser.therianCoin, therianSlots: updatedUser.therianSlots },
+      newBalance: { gold: updatedUser.gold, essence: updatedUser.essence, therianSlots: updatedUser.therianSlots },
     })
   }
 
@@ -149,13 +156,18 @@ export async function POST(req: NextRequest) {
     })
   }
 
-  // Deducir currency
+  // Deducir currency — build data explicitly so it's never an empty object
+  const deductData: { gold?: { decrement: number }; essence?: { decrement: number } } = {}
+  if (item.costGold > 0) deductData.gold = { decrement: item.costGold }
+  if (item.costCoin > 0) deductData.essence = { decrement: item.costCoin }
+
+  if (Object.keys(deductData).length === 0) {
+    return NextResponse.json({ error: 'ITEM_HAS_NO_COST' }, { status: 500 })
+  }
+
   const updatedUser = await db.user.update({
     where: { id: session.user.id },
-    data: {
-      ...(item.costGold > 0 ? { gold: { decrement: item.costGold } } : {}),
-      ...(item.costCoin > 0 ? { essence: { decrement: item.costCoin } } : {}),
-    },
+    data: deductData,
     select: { gold: true, essence: true, therianSlots: true },
   })
 
