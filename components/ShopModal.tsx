@@ -36,8 +36,8 @@ export default function ShopModal({ therian, wallet, onClose, onPurchase }: Prop
   const goldItems = SHOP_ITEMS.filter(i => i.costGold > 0)
   const coinItems = SHOP_ITEMS.filter(i => i.costCoin > 0)
   const displayItems = tab === 'gold' ? goldItems : coinItems
-  const essenciaEggs = EGGS.filter(e => e.currency === 'essencia')
-  const coinEggs = EGGS.filter(e => e.currency === 'therianCoin')
+  const essenciaEggs = EGGS.filter(e => e.currency === 'essence')
+  const coinEggs = EGGS.filter(e => e.currency === 'gold')
   const displayEggs = tab === 'coin' ? essenciaEggs : coinEggs
 
   function getEggQty(id: string) { return eggQty[id] ?? 1 }
