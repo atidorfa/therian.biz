@@ -30,7 +30,7 @@ export async function POST(req: NextRequest) {
   }
 
   const therian = await db.therian.findFirst({
-    where: { id: body.therianId, userId: session.user.id },
+    where: { id: body.therianId, userId: session.user.id, status: 'active' },
   })
 
   if (!therian) {

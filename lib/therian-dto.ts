@@ -102,6 +102,7 @@ export function toTherianDTO(therian: Therian) {
     canBite,
     nextBiteAt,
     equippedAccessories: parseEquippedAccessories(therian.accessories ?? null),
+    status: therian.status,
     createdAt: therian.createdAt.toISOString(),
   }
 }

@@ -23,8 +23,8 @@ export async function POST(req: Request) {
     }
 
     const therian = therianId
-      ? await db.therian.findFirst({ where: { id: therianId, userId: session.user.id } })
-      : await db.therian.findFirst({ where: { userId: session.user.id }, orderBy: { createdAt: 'asc' } })
+      ? await db.therian.findFirst({ where: { id: therianId, userId: session.user.id, status: 'active' } })
+      : await db.therian.findFirst({ where: { userId: session.user.id, status: 'active' }, orderBy: { createdAt: 'asc' } })
 
     if (!therian) {
       return NextResponse.json({ error: 'NO_THERIAN' }, { status: 404 })

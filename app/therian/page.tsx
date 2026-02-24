@@ -21,7 +21,7 @@ export default async function TherianPage() {
 
   const [therians, user] = await Promise.all([
     db.therian.findMany({
-      where: { userId: session.user.id },
+      where: { userId: session.user.id, status: 'active' },
       orderBy: { createdAt: 'asc' },
     }),
     db.user.findUnique({

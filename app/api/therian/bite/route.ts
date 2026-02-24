@@ -27,8 +27,8 @@ export async function POST(req: NextRequest) {
 
   // Load challenger
   let challenger = parsed.data.therianId
-    ? await db.therian.findFirst({ where: { id: parsed.data.therianId, userId: session.user.id } })
-    : await db.therian.findFirst({ where: { userId: session.user.id }, orderBy: { createdAt: 'asc' } })
+    ? await db.therian.findFirst({ where: { id: parsed.data.therianId, userId: session.user.id, status: 'active' } })
+    : await db.therian.findFirst({ where: { userId: session.user.id, status: 'active' }, orderBy: { createdAt: 'asc' } })
   if (!challenger) {
     return NextResponse.json({ error: 'NO_THERIAN' }, { status: 404 })
   }
@@ -44,7 +44,7 @@ export async function POST(req: NextRequest) {
 
   // Load target
   const target = await db.therian.findFirst({
-    where: { name: { equals: target_name, mode: 'insensitive' } },
+    where: { name: { equals: target_name, mode: 'insensitive' }, status: 'active' },
   })
   if (!target) {
     return NextResponse.json({ error: 'TARGET_NOT_FOUND' }, { status: 404 })

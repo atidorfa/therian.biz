@@ -11,7 +11,7 @@ export async function GET() {
   }
 
   let therian = await db.therian.findFirst({
-    where: { userId: session.user.id },
+    where: { userId: session.user.id, status: 'active' },
     orderBy: { createdAt: 'asc' },
   })
 

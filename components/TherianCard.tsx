@@ -63,6 +63,11 @@ export default function TherianCard({ therian: initialTherian, rank }: Props) {
   const [resetError, setResetError] = useState<string | null>(null)
   const [resetConfirming, setResetConfirming] = useState(false)
   const [showStats, setShowStats] = useState(false)
+
+  // Capsule
+  const [capsuling, setCapsuling] = useState(false)
+  const [capsuleError, setCapsuleError] = useState<string | null>(null)
+  const [showCapsuleConfirm, setShowCapsuleConfirm] = useState(false)
   const [selectedSlot, setSelectedSlot] = useState<number | null>(null)
   const [equipping, setEquipping] = useState(false)
 
@@ -318,6 +323,35 @@ export default function TherianCard({ therian: initialTherian, rank }: Props) {
       setResetError('Error de conexión.')
     } finally {
       setResetting(false)
+    }
+  }
+
+  const handleCapsule = async () => {
+    setCapsuling(true)
+    setCapsuleError(null)
+    try {
+      const res = await fetch('/api/therian/capsule', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ therianId: therian.id }),
+      })
+      const data = await res.json()
+      if (!res.ok) {
+        if (data.error === 'LAST_ACTIVE_THERIAN') {
+          setCapsuleError('Necesitas al menos un Therian activo.')
+        } else {
+          setCapsuleError('No se pudo capsular. Intenta de nuevo.')
+        }
+        setShowCapsuleConfirm(false)
+        return
+      }
+      setShowCapsuleConfirm(false)
+      window.dispatchEvent(new CustomEvent('therian-capsulated', { detail: { id: therian.id } }))
+    } catch {
+      setCapsuleError('Error de conexión.')
+      setShowCapsuleConfirm(false)
+    } finally {
+      setCapsuling(false)
     }
   }
 
@@ -676,6 +710,15 @@ export default function TherianCard({ therian: initialTherian, rank }: Props) {
               <p className="text-white/30 text-xs leading-none">Nivel 2</p>
             </div>
           )}
+
+          {/* Col 2 fila 2: Capsular */}
+          <button
+            onClick={() => { setShowCapsuleConfirm(true); setCapsuleError(null) }}
+            className="rounded-lg border border-purple-500/20 bg-purple-500/5 px-3 py-2 text-center hover:bg-purple-500/10 hover:border-purple-500/30 transition-colors"
+          >
+            <p className="text-purple-300 text-xs font-semibold leading-none mb-0.5">💊 Capsular</p>
+            <p className="text-purple-300/50 text-xs leading-none">Guardar</p>
+          </button>
         </div>
 
         {/* Avatar */}
@@ -1176,6 +1219,44 @@ export default function TherianCard({ therian: initialTherian, rank }: Props) {
               )}
             </div>
 
+          </div>
+        </div>
+      )}
+
+      {/* Capsule confirmation modal */}
+      {showCapsuleConfirm && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm"
+          onClick={() => !capsuling && setShowCapsuleConfirm(false)}
+        >
+          <div
+            className="mx-4 w-full max-w-xs rounded-2xl border border-purple-500/20 bg-[#0F0F1A] p-6 shadow-2xl space-y-4"
+            onClick={e => e.stopPropagation()}
+          >
+            <div className="text-center space-y-1">
+              <p className="text-2xl">💊</p>
+              <p className="text-white font-semibold text-sm">¿Capsular a {therian.name ?? 'este Therian'}?</p>
+              <p className="text-white/40 text-xs">Quedará guardado en tus cápsulas. Podrás liberarlo desde el inventario.</p>
+            </div>
+            {capsuleError && (
+              <p className="text-red-400 text-xs text-center">{capsuleError}</p>
+            )}
+            <div className="flex gap-2">
+              <button
+                onClick={() => setShowCapsuleConfirm(false)}
+                disabled={capsuling}
+                className="flex-1 py-2 rounded-lg border border-white/10 text-white/40 hover:text-white/70 text-xs transition-colors disabled:opacity-40"
+              >
+                Cancelar
+              </button>
+              <button
+                onClick={handleCapsule}
+                disabled={capsuling}
+                className="flex-1 py-2 rounded-lg bg-purple-700 hover:bg-purple-600 text-white text-xs font-semibold transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+              >
+                {capsuling ? 'Guardando...' : '💊 Capsular'}
+              </button>
+            </div>
           </div>
         </div>
       )}

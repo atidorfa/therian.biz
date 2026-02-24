@@ -10,7 +10,7 @@ export async function GET() {
   }
 
   const therians = await db.therian.findMany({
-    where: { userId: session.user.id, status: 'active' },
+    where: { userId: session.user.id, status: 'capsule' },
     orderBy: { createdAt: 'asc' },
   })
 
