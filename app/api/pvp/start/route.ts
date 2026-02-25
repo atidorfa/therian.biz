@@ -2,23 +2,13 @@ import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
 import { getSession } from '@/lib/session'
 import { db } from '@/lib/db'
-import { initBattleState, resolveTurn, isPlayerTurn } from '@/lib/pvp/engine'
-import { aiDecide } from '@/lib/pvp/ai'
+import { initBattleState } from '@/lib/pvp/engine'
 import type { InitTeamMember } from '@/lib/pvp/engine'
-import type { BattleState } from '@/lib/pvp/types'
+import { getPaletteById } from '@/lib/catalogs/appearance'
 
 const schema = z.object({
   attackerTeamIds: z.array(z.string()).length(3),
 })
-
-// RNG simple basado en timestamp (no determinista, suficiente para prod)
-function makeRng(seed: number) {
-  let s = seed
-  return () => {
-    s = (s * 1664525 + 1013904223) >>> 0
-    return s / 0xFFFFFFFF
-  }
-}
 
 export async function POST(req: NextRequest) {
   const session = await getSession()
@@ -62,7 +52,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'NO_OPPONENTS' }, { status: 404 })
   }
 
-  // Elegir un oponente al azar que tenga exactamente 3 Therians activos
+  // Elegir un oponente al azar que tenga al menos 3 Therians activos
   const shuffled = opponents.sort(() => Math.random() - 0.5)
   let defenderTherians = null
   for (const opp of shuffled) {
@@ -81,7 +71,6 @@ export async function POST(req: NextRequest) {
   }
 
   const VALID_ARCHETYPES = ['forestal', 'electrico', 'acuatico', 'volcanico'] as const
-  // Therians creados antes del sistema PvP tienen traitId del catálogo viejo → mapear al arquetipo más cercano
   const LEGACY_ARCHETYPE_MAP: Record<string, InitTeamMember['archetype']> = {
     silent:      'forestal',
     mystic:      'forestal',
@@ -100,8 +89,10 @@ export async function POST(req: NextRequest) {
     return LEGACY_ARCHETYPE_MAP[traitId] ?? 'forestal'
   }
 
-  function toMember(t: typeof attackerTherians[0], side: 'attacker' | 'defender'): InitTeamMember {
+  function toMember(t: typeof attackerTherians[0]): InitTeamMember {
     const stats = JSON.parse(t.stats) as { vitality: number; agility: number; instinct: number; charisma: number }
+    const appearance = JSON.parse(t.appearance) as { palette: string; eyes: string; pattern: string; signature: string }
+    const palette = getPaletteById(appearance.palette)
     return {
       therianId:         t.id,
       name:              t.name,
@@ -111,42 +102,41 @@ export async function POST(req: NextRequest) {
       instinct:          stats.instinct,
       charisma:          stats.charisma,
       equippedAbilities: JSON.parse(t.equippedAbilities || '[]') as string[],
+      avatarSnapshot: {
+        appearance: {
+          palette:      appearance.palette,
+          paletteColors: palette
+            ? { primary: palette.primary, secondary: palette.secondary, accent: palette.accent }
+            : { primary: '#888', secondary: '#555', accent: '#aaa' },
+          eyes:      appearance.eyes,
+          pattern:   appearance.pattern,
+          signature: appearance.signature,
+        },
+        level:  t.level,
+        rarity: t.rarity,
+      },
     }
   }
 
-  const attackerMembers = attackerTherians.map(t => toMember(t, 'attacker'))
-  const defenderMembers = defenderTherians.map(t => toMember(t, 'defender'))
+  const attackerMembers = attackerTherians.map(t => toMember(t))
+  const defenderMembers = defenderTherians.map(t => toMember(t))
 
-  let state: BattleState
+  let state
   try {
     state = initBattleState(attackerMembers, defenderMembers)
-
-    // Auto-resolver turnos de IA hasta que sea turno del jugador (o fin)
-    const rng = makeRng(Date.now())
-    let safetyCounter = 0
-    while (state.status === 'active' && !isPlayerTurn(state) && safetyCounter < 20) {
-      const actor = state.slots[state.turnIndex]
-      const allies  = state.slots.filter(s => s.side === 'defender')
-      const enemies = state.slots.filter(s => s.side === 'attacker')
-      const aiAction = aiDecide(actor, allies, enemies)
-      const { state: next } = resolveTurn(state, aiAction, rng)
-      state = next
-      safetyCounter++
-    }
   } catch (err) {
     console.error('[pvp/start] Engine error:', err)
     return NextResponse.json({ error: 'ENGINE_ERROR', detail: String(err) }, { status: 500 })
   }
 
-  // Persistir batalla
+  // Persistir batalla con estado inicial (la resolución completa ocurre en /action)
   const battle = await db.pvpBattle.create({
     data: {
       attackerId:   userId,
       attackerTeam: JSON.stringify(body.attackerTeamIds),
       defenderTeam: JSON.stringify(defenderTherians.map(t => t.id)),
       state:        JSON.stringify(state),
-      status:       state.status,
-      winnerId:     state.winnerId === 'attacker' ? userId : null,
+      status:       'active',
     },
   })
 

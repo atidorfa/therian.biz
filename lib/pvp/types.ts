@@ -54,6 +54,18 @@ export interface ActiveEffect {
   turnsRemaining: number
 }
 
+export interface AvatarSnapshot {
+  appearance: {
+    palette: string
+    paletteColors: { primary: string; secondary: string; accent: string }
+    eyes: string
+    pattern: string
+    signature: string
+  }
+  level: number
+  rarity: string
+}
+
 export interface TurnSlot {
   therianId:         string
   side:              'attacker' | 'defender'
@@ -70,6 +82,7 @@ export interface TurnSlot {
   cooldowns:         Record<string, number>  // abilityId → turnos restantes
   effects:           ActiveEffect[]
   isDead:            boolean
+  avatarSnapshot?:   AvatarSnapshot
 }
 
 export interface ActionLogEntry {
@@ -109,6 +122,28 @@ export interface BattleState {
   log:        ActionLogEntry[]
   status:     'active' | 'completed'
   winnerId:   string | null  // userId del ganador, o null si ganó el defensor
+}
+
+// ─── Snapshot por turno (para animación cliente) ──────────────────────────────
+
+/** Estado mínimo y mutable capturado después de cada turno resuelto */
+export interface SlotSnapshot {
+  therianId:        string
+  currentHp:        number
+  isDead:           boolean
+  effects:          ActiveEffect[]
+  cooldowns:        Record<string, number>
+  effectiveAgility: number
+}
+
+export interface TurnSnapshot {
+  actorIndex: number           // índice del slot que actuó este turno
+  turnIndex:  number           // índice del próximo en actuar
+  round:      number
+  slots:      SlotSnapshot[]
+  logEntry:   ActionLogEntry
+  status:     'active' | 'completed'
+  winnerId:   string | null
 }
 
 // ─── IA ───────────────────────────────────────────────────────────────────────

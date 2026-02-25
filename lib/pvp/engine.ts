@@ -1,5 +1,5 @@
 import type {
-  TurnSlot, BattleState, ActionLogEntry, ActionResult, Aura, Archetype,
+  TurnSlot, BattleState, ActionLogEntry, ActionResult, Aura, Archetype, AvatarSnapshot,
 } from './types'
 import { FORMULAS, getTypeMultiplier } from './types'
 import { ABILITY_BY_ID, INNATE_BY_ARCHETYPE } from './abilities'
@@ -16,6 +16,7 @@ export interface InitTeamMember {
   instinct:   number
   charisma:   number
   equippedAbilities: string[]  // IDs equipadas (max 4)
+  avatarSnapshot?: AvatarSnapshot
 }
 
 export function initBattleState(
@@ -80,6 +81,7 @@ function buildSlot(m: InitTeamMember, side: 'attacker' | 'defender'): TurnSlot {
     cooldowns:        {},
     effects:          [],
     isDead:           false,
+    avatarSnapshot:   m.avatarSnapshot,
   }
 }
 
