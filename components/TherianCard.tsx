@@ -69,6 +69,7 @@ export default function TherianCard({ therian: initialTherian, rank, slots = 1 }
   const [lastDelta, setLastDelta] = useState<{ stat: string; amount: number } | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [goldEarned, setGoldEarned] = useState<number | null>(null)
+  const [xpEarned, setXpEarned] = useState<number | null>(null)
   const [showActionPopup, setShowActionPopup] = useState(false)
   const [resetting, setResetting] = useState(false)
   const [resetError, setResetError] = useState<string | null>(null)
@@ -441,12 +442,14 @@ export default function TherianCard({ therian: initialTherian, rank, slots = 1 }
     setNarrative(null)
     setLastDelta(null)
     setGoldEarned(null)
+    setXpEarned(null)
   }
 
   const handleActionResult = (data: ActionResultData) => {
     setTherian(data.therian)
     setNarrative(data.narrative)
     setLastDelta(data.delta)
+    setXpEarned(data.delta.xp)
     if (data.goldEarned) {
       setGoldEarned(data.goldEarned)
       window.dispatchEvent(new CustomEvent('wallet-update'))
@@ -692,11 +695,8 @@ export default function TherianCard({ therian: initialTherian, rank, slots = 1 }
               className="group rounded-lg border border-white/5 bg-white/3 px-3 py-2 text-center hover:bg-white/5 transition-colors"
             >
               <p className="text-white/30 text-xs font-semibold leading-none mb-0.5">⚔️ Morder</p>
-              <p className="text-white/50 text-xs leading-none group-hover:hidden font-mono">
+              <p className="text-white/50 text-xs leading-none font-mono">
                 {therian.nextBiteAt ? countdown(therian.nextBiteAt) : 'mañana'}
-              </p>
-              <p className="text-white/70 text-xs leading-none hidden group-hover:block">
-                {therian.nextBiteAt ? availableAt(therian.nextBiteAt) : 'mañana'}
               </p>
             </button>
           )}
@@ -735,11 +735,8 @@ export default function TherianCard({ therian: initialTherian, rank, slots = 1 }
               className="group rounded-lg border border-white/5 bg-white/3 px-3 py-2 text-center hover:bg-white/5 transition-colors"
             >
               <p className="text-white/30 text-xs font-semibold leading-none mb-0.5">🌿 Templar</p>
-              <p className="text-white/50 text-xs leading-none group-hover:hidden font-mono">
+              <p className="text-white/50 text-xs leading-none font-mono">
                 {therian.nextActionAt ? countdown(therian.nextActionAt) : 'espera'}
-              </p>
-              <p className="text-white/70 text-xs leading-none hidden group-hover:block">
-                {therian.nextActionAt ? availableAt(therian.nextActionAt) : 'espera'}
               </p>
             </button>
           ) : (
@@ -1351,10 +1348,20 @@ export default function TherianCard({ therian: initialTherian, rank, slots = 1 }
 
             {narrative && <FlavorText text={narrative} key={narrative} />}
 
-            {goldEarned !== null && (
-              <div className="flex items-center justify-center gap-1.5 rounded-xl border border-amber-500/20 bg-amber-500/5 px-4 py-2 text-amber-400 text-sm font-semibold">
-                <span>🪙</span>
-                <span>+{goldEarned} GOLD</span>
+            {(goldEarned !== null || xpEarned !== null) && (
+              <div className="flex items-center justify-center gap-3">
+                {xpEarned !== null && (
+                  <div className="flex items-center gap-1.5 rounded-xl border border-purple-500/20 bg-purple-500/5 px-4 py-2 text-purple-400 text-sm font-semibold">
+                    <span>✨</span>
+                    <span>+{xpEarned} XP</span>
+                  </div>
+                )}
+                {goldEarned !== null && (
+                  <div className="flex items-center gap-1.5 rounded-xl border border-amber-500/20 bg-amber-500/5 px-4 py-2 text-amber-400 text-sm font-semibold">
+                    <span>🪙</span>
+                    <span>+{goldEarned} GOLD</span>
+                  </div>
+                )}
               </div>
             )}
 
