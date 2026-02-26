@@ -28,10 +28,29 @@ const RARITY_BORDER: Record<string, string> = {
   MYTHIC:    'border-red-500/60',
 }
 
+const TIER_COLORS: Record<string, { border: string; badge: string; glow: string }> = {
+  standard:     { border: 'border-slate-500/40',  badge: 'bg-slate-500/20 text-slate-300',    glow: '' },
+  premium:      { border: 'border-purple-500/50', badge: 'bg-purple-500/20 text-purple-300',  glow: 'shadow-[0_0_12px_rgba(168,85,247,0.15)]' },
+  premium_plus: { border: 'border-amber-500/50',  badge: 'bg-amber-500/20 text-amber-300',    glow: 'shadow-[0_0_16px_rgba(245,158,11,0.2)]' },
+}
+
+const TIER_LABEL: Record<string, string> = {
+  standard:     'Estándar',
+  premium:      'Premium',
+  premium_plus: 'Legendario',
+}
+
 export default function TeamSetup({ therians, onBattleStart }: Props) {
   const [selected, setSelected] = useState<Set<string>>(new Set())
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+
+  // Líder del equipo seleccionado = mayor CHA → determina el aura activa
+  const selectedTherians = therians.filter(t => selected.has(t.id))
+  const leader = selectedTherians.length > 0
+    ? selectedTherians.reduce((best, t) => t.stats.charisma > best.stats.charisma ? t : best)
+    : null
+  const activeAura = leader?.aura ?? null
 
   function toggleSelect(id: string) {
     setSelected(prev => {
@@ -101,6 +120,39 @@ export default function TeamSetup({ therians, onBattleStart }: Props) {
           </div>
         ))}
         <span className="text-white/40 text-sm ml-1">{selected.size}/3 seleccionados</span>
+      </div>
+
+      {/* Aura activa de la formación */}
+      <div className={`rounded-xl border p-3 transition-all duration-300 min-h-[60px] ${
+        activeAura
+          ? `${TIER_COLORS[activeAura.tier]?.border ?? 'border-white/10'} bg-white/3 ${TIER_COLORS[activeAura.tier]?.glow ?? ''}`
+          : 'border-white/8 bg-white/2'
+      }`}>
+        {activeAura ? (
+          <div className="flex items-start gap-2">
+            <span className="text-lg leading-none mt-0.5">
+              {ARCH_META[activeAura.archetype as keyof typeof ARCH_META]?.emoji ?? '✨'}
+            </span>
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center gap-2 flex-wrap mb-0.5">
+                <span className="text-white/40 text-[10px] uppercase tracking-widest">Aura activa</span>
+                <span className={`text-[9px] px-2 py-0.5 rounded-full font-medium uppercase tracking-wide ${TIER_COLORS[activeAura.tier]?.badge ?? ''}`}>
+                  {TIER_LABEL[activeAura.tier] ?? activeAura.tier}
+                </span>
+                <span className="text-white/25 text-[10px]">
+                  Líder: {leader?.name ?? '—'} (CHA {leader?.stats.charisma})
+                </span>
+              </div>
+              <p className="text-white font-semibold text-sm leading-tight">{activeAura.name}</p>
+              <p className="text-white/45 text-xs mt-0.5 leading-relaxed">{activeAura.description}</p>
+            </div>
+          </div>
+        ) : (
+          <div className="flex items-center gap-2 text-white/20">
+            <span className="text-base">✨</span>
+            <span className="text-xs">Selecciona Therians para ver el aura activa</span>
+          </div>
+        )}
       </div>
 
       {/* Therians grid */}

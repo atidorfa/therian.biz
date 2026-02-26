@@ -63,6 +63,7 @@ export async function POST() {
         appearance: JSON.stringify(generated.appearance),
         stats:      JSON.stringify(generated.stats),
         traitId:    generated.traitId,
+        auraId:     generated.auraId,
         name:       uniqueName,
         status:     hasSlot ? 'active' : 'capsule',
       },

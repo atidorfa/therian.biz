@@ -863,7 +863,36 @@ export default function TherianCard({ therian: initialTherian, rank }: Props) {
           )
         })()}
 
-
+        {/* Aura */}
+        {therian.aura && (() => {
+          const tierColors: Record<string, string> = {
+            standard:     'text-slate-400 border-slate-500/40 bg-slate-500/10',
+            premium:      'text-purple-300 border-purple-500/40 bg-purple-500/10',
+            premium_plus: 'text-amber-300 border-amber-500/40 bg-amber-500/10',
+          }
+          const archEmoji: Record<string, string> = {
+            forestal:  '🌿',
+            volcanico: '🔥',
+            acuatico:  '💧',
+            electrico: '⚡',
+          }
+          const tierColor = tierColors[therian.aura.tier] ?? tierColors.standard
+          return (
+            <div className="mt-4 rounded-xl border border-white/10 bg-white/3 p-3">
+              <div className="flex items-center justify-between mb-1">
+                <div className="flex items-center gap-1.5">
+                  <span className="text-xs">{archEmoji[therian.aura.archetype] ?? '✨'}</span>
+                  <span className="text-white/50 text-[10px] uppercase tracking-widest">Aura</span>
+                </div>
+                <span className={`text-[9px] px-2 py-0.5 rounded-full border font-medium uppercase tracking-wide ${tierColor}`}>
+                  {therian.aura.tierLabel}
+                </span>
+              </div>
+              <p className="text-white font-semibold text-sm">{therian.aura.name}</p>
+              <p className="text-[#A99DC0] text-xs mt-0.5 leading-relaxed">{therian.aura.description}</p>
+            </div>
+          )
+        })()}
 
         {/* PvP Abilities */}
         {(() => {

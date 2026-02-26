@@ -3,6 +3,7 @@ import { getSpeciesById } from './catalogs/species'
 import { getTraitById } from './catalogs/traits'
 import { getPaletteById } from './catalogs/appearance'
 import { getRuneById, type Rune } from './catalogs/runes'
+import { getAuraById, TIER_LABEL } from './catalogs/auras'
 import type { TherianStats, TherianAppearance, Rarity } from './generation/engine'
 import { SHOP_ITEMS } from './shop/catalog'
 import { MAX_ACTIONS } from './actions/narratives'
@@ -109,6 +110,20 @@ export function toTherianDTO(therian: Therian) {
     nextBiteAt,
     equippedAccessories: parseEquippedAccessories(therian.accessories ?? null),
     equippedAbilities: JSON.parse(therian.equippedAbilities || '[]') as string[],
+    aura: (() => {
+      const auraId = (therian as any).auraId as string | null | undefined
+      if (!auraId) return null
+      const def = getAuraById(auraId)
+      if (!def) return null
+      return {
+        id:          def.id,
+        name:        def.name,
+        description: def.description,
+        tier:        def.tier,
+        tierLabel:   TIER_LABEL[def.tier],
+        archetype:   def.archetype,
+      }
+    })(),
     status: therian.status,
     createdAt: therian.createdAt.toISOString(),
   }

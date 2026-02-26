@@ -60,6 +60,8 @@ export async function POST(
         slots: state.slots.map(s => ({
           therianId:        s.therianId,
           currentHp:        s.currentHp,
+          maxHp:            s.maxHp,
+          shieldHp:         s.shieldHp,
           isDead:           s.isDead,
           effects:          s.effects,
           cooldowns:        s.cooldowns,

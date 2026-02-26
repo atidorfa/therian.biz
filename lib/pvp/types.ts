@@ -1,3 +1,6 @@
+import type { AuraEffectDef } from '../catalogs/auras'
+export type { AuraEffectDef }
+
 // ─── Tipos base ───────────────────────────────────────────────────────────────
 
 export type Archetype = 'forestal' | 'electrico' | 'acuatico' | 'volcanico'
@@ -77,11 +80,14 @@ export interface TurnSlot {
   effectiveAgility:  number       // agility con buffs/debuffs aplicados
   vitality:          number       // para fórmulas de curación
   instinct:          number       // para fórmulas de bloqueo
+  charisma:          number       // para fórmulas de aura
   equippedAbilities: string[]     // IDs de habilidades equipadas (max 4)
   innateAbilityId:   string       // básico innato según arquetipo
   cooldowns:         Record<string, number>  // abilityId → turnos restantes
   effects:           ActiveEffect[]
   isDead:            boolean
+  shieldHp:          number       // escudo de daño absorbido antes de currentHp
+  isLeader:          boolean      // el de mayor CHA del equipo (para Avatar de la Cascada)
   avatarSnapshot?:   AvatarSnapshot
 }
 
@@ -108,10 +114,28 @@ export interface ActionResult {
 }
 
 export interface Aura {
+  auraId:    string          // ID del catálogo (lib/catalogs/auras.ts)
+  name:      string          // nombre legible
   archetype: Archetype
-  type:      AuraType
-  value:     number        // hp/agility como puntos, damage/defense como decimal
+  type:      AuraType        // mantenido por retrocompatibilidad UI
+  value:     number          // leader.charisma (mantenido por retrocompatibilidad)
+  effect:    AuraEffectDef   // definición completa del efecto
   side:      'attacker' | 'defender'
+}
+
+// Estado de runtime de un aura durante la batalla
+export interface AuraRuntimeState {
+  resurrectionUsed:  boolean         // Resurrección Silvestre ya activada
+  avatarUsed:        boolean         // Avatar de la Cascada ya activado
+  ceniCegadoraUsed:  boolean         // Ceniza Cegadora ya procesada
+  fallenCount:       number          // aliados caídos (Sacrificio Ígneo)
+  tideSurge:         number          // acumulado de Marea Creciente (0–0.20)
+  llamaradaTurns:    number          // turnos restantes del buff de Llamarada Vengativa
+  circuitoStacks:    number          // stacks de Circuito Sincronizado (0–3)
+  lastAbilityArch:   string | null   // arquetipo de la última habilidad usada
+  shieldLastRefresh: number          // número de ronda en que se refrescó Escudo Hidráulico
+  velocidadActive:   boolean         // Velocidad Terminal activa (reset en ronda 2)
+  tormentaTargetId:  string | null   // therianId con -10% def por Tormenta de Iones (esta ronda)
 }
 
 export interface BattleState {
@@ -119,6 +143,10 @@ export interface BattleState {
   turnIndex:  number       // índice circular en slots (saltea muertos)
   round:      number
   auras:      Aura[]       // puede haber 1 por equipo (si ambos tienen líder distinto)
+  auraState:  {
+    attacker:  AuraRuntimeState
+    defender:  AuraRuntimeState
+  }
   log:        ActionLogEntry[]
   status:     'active' | 'completed'
   winnerId:   string | null  // userId del ganador, o null si ganó el defensor
@@ -130,6 +158,8 @@ export interface BattleState {
 export interface SlotSnapshot {
   therianId:        string
   currentHp:        number
+  maxHp:            number
+  shieldHp:         number
   isDead:           boolean
   effects:          ActiveEffect[]
   cooldowns:        Record<string, number>

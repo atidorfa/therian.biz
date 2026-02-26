@@ -2,6 +2,8 @@ import { createSeed, createRNG } from './prng'
 import { SPECIES, getSpeciesById } from '../catalogs/species'
 import { TRAITS, getTraitById } from '../catalogs/traits'
 import { PALETTES, EYES, PATTERNS, SIGNATURES } from '../catalogs/appearance'
+import { pickAuraForRarity, type AuraRarity } from '../catalogs/auras'
+import type { Archetype } from '../pvp/types'
 
 export type Rarity = 'COMMON' | 'UNCOMMON' | 'RARE' | 'EPIC' | 'LEGENDARY' | 'MYTHIC'
 
@@ -27,6 +29,7 @@ export interface GeneratedTherian {
   traitId: string
   stats: TherianStats
   appearance: TherianAppearance
+  auraId: string
 }
 
 const RARITY_WEIGHTS = [
@@ -54,6 +57,27 @@ const RARITY_VARIANCE: Record<Rarity, number> = {
   EPIC:      10,
   LEGENDARY: 15,
   MYTHIC:    10,
+}
+
+// Mapa de traitId legacy → arquetipo (idéntico al de pvp/start)
+const LEGACY_ARCHETYPE_MAP: Record<string, Archetype> = {
+  silent:      'forestal',
+  mystic:      'forestal',
+  guardian:    'acuatico',
+  curious:     'acuatico',
+  impulsive:   'electrico',
+  feral:       'electrico',
+  charismatic: 'volcanico',
+  loyal:       'volcanico',
+}
+
+const VALID_ARCHETYPES: Archetype[] = ['forestal', 'electrico', 'acuatico', 'volcanico']
+
+function resolveArchetype(traitId: string): Archetype {
+  if ((VALID_ARCHETYPES as string[]).includes(traitId)) {
+    return traitId as Archetype
+  }
+  return LEGACY_ARCHETYPE_MAP[traitId] ?? 'forestal'
 }
 
 function clamp(value: number, min = 1, max = 100): number {
@@ -94,7 +118,11 @@ export function generateTherian(userId: string, secret: string): GeneratedTheria
     signature: rng.choice(SIGNATURES).id,
   }
 
-  return { seed, timestamp, rarity, speciesId: species.id, traitId: trait.id, stats, appearance }
+  // 6. Aura (RNG ponderado por rareza)
+  const archetype = resolveArchetype(trait.id)
+  const auraId = pickAuraForRarity(archetype, rarity as AuraRarity, () => rng.next())
+
+  return { seed, timestamp, rarity, speciesId: species.id, traitId: trait.id, stats, appearance, auraId }
 }
 
 // Re-exportar para conveniencia
@@ -134,5 +162,8 @@ export function generateTherianWithRarity(userId: string, secret: string, forced
     signature: rng.choice(SIGNATURES).id,
   }
 
-  return { seed, timestamp, rarity: forcedRarity, speciesId: species.id, traitId: trait.id, stats, appearance }
+  const archetype = resolveArchetype(trait.id)
+  const auraId = pickAuraForRarity(archetype, forcedRarity as AuraRarity, () => rng.next())
+
+  return { seed, timestamp, rarity: forcedRarity, speciesId: species.id, traitId: trait.id, stats, appearance, auraId }
 }
