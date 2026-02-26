@@ -12,6 +12,7 @@ import CurrencyDisplay from '@/components/CurrencyDisplay'
 import NavShopButton from '@/components/NavShopButton'
 import NavFusionButton from '@/components/NavFusionButton'
 import NavInventoryButton from '@/components/NavInventoryButton'
+import PassiveIncomeCard from '@/components/PassiveIncomeCard'
 import { ACHIEVEMENTS } from '@/lib/catalogs/achievements'
 
 export const dynamic = 'force-dynamic'
@@ -108,6 +109,7 @@ export default async function TherianPage() {
           xp={user?.xp ?? 0}
           therianCount={dtos.length}
         />
+        <PassiveIncomeCard />
         <AchievementsPanel achievements={achievementEntries} />
         <MissionsPanel />
       </div>
