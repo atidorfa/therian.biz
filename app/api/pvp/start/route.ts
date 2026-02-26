@@ -101,6 +101,7 @@ export async function POST(req: NextRequest) {
       agility:           stats.agility,
       instinct:          stats.instinct,
       charisma:          stats.charisma,
+      auraId:            (t as any).auraId ?? null,
       equippedAbilities: JSON.parse(t.equippedAbilities || '[]') as string[],
       avatarSnapshot: {
         appearance: {
@@ -112,7 +113,7 @@ export async function POST(req: NextRequest) {
           pattern:   appearance.pattern,
           signature: appearance.signature,
         },
-        level:  t.level,
+        level:  (t as any).level ?? 1,
         rarity: t.rarity,
       },
     }

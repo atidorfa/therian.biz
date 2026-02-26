@@ -32,11 +32,16 @@ function archMeta(archetype: string) {
   return ARCH_META[archetype as keyof typeof ARCH_META] ?? ARCH_META.forestal
 }
 
-const AURA_LABEL: Record<string, string> = {
+const AURA_LABEL_FALLBACK: Record<string, string> = {
   hp:      '🌿 Vitalidad',
   damage:  '🔥 Combate',
   defense: '💧 Escudo',
   agility: '⚡ Celeridad',
+}
+
+function getAuraLabel(aura: { name?: string; type?: string }): string {
+  if (aura.name) return aura.name
+  return AURA_LABEL_FALLBACK[aura.type ?? ''] ?? (aura.type ?? '')
 }
 
 const SPEED_OPTIONS = [
@@ -522,8 +527,8 @@ export default function BattleField({ battleId, initialState, onComplete }: Prop
           <div className="flex items-center justify-between mb-1">
             <span className="text-white/50 text-xs font-medium">Tu equipo</span>
             {myAura && (
-              <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-white/5 border border-white/10 text-white/35">
-                {AURA_LABEL[myAura.type] ?? myAura.type}
+              <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-white/5 border border-white/10 text-white/35" title={(myAura as any).auraId}>
+                {getAuraLabel(myAura)}
               </span>
             )}
           </div>
@@ -544,8 +549,8 @@ export default function BattleField({ battleId, initialState, onComplete }: Prop
           <div className="flex items-center justify-between mb-1">
             <span className="text-white/50 text-xs font-medium">Rival</span>
             {enemyAura && (
-              <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-white/5 border border-white/10 text-white/35">
-                {AURA_LABEL[enemyAura.type] ?? enemyAura.type}
+              <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-white/5 border border-white/10 text-white/35" title={(enemyAura as any).auraId}>
+                {getAuraLabel(enemyAura)}
               </span>
             )}
           </div>

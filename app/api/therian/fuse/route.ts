@@ -114,6 +114,7 @@ export async function POST(req: Request) {
       appearance: JSON.stringify(generated.appearance),
       stats:      JSON.stringify(generated.stats),
       traitId:    generated.traitId,
+      auraId:     generated.auraId,
       name,
     },
   })

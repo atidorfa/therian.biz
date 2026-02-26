@@ -62,6 +62,7 @@ model Therian {
   accessories       String    @default("[]") @db.Text
   status            String    @default("active") // "active" | "capsule"
   equippedAbilities String    @default("[]") @db.Text // JSON: string[] ability IDs, max 4
+  auraId            String?   // ID from lib/catalogs/auras.ts (assigned at generation)
 
   battlesAsChallenger BattleLog[] @relation("Challenger")
   battlesAsTarget     BattleLog[] @relation("Target")
