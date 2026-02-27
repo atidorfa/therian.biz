@@ -2,7 +2,7 @@
 
 import React, { useRef, useEffect } from 'react'
 import type { TherianDTO } from '@/lib/therian-dto'
-import { ACC_VISUAL_SVG } from '@/lib/items/accessory-visuals'
+import { ACC_VISUAL_SVG, CLAW_SIDE_SVG } from '@/lib/items/accessory-visuals'
 
 interface Props {
   therian: TherianDTO
@@ -140,9 +140,10 @@ export default function TherianAvatarSVG({
   const earsId  = accTypeId('orejas')
   const tailId  = accTypeId('cola')
   const eyesId  = accTypeId('ojos')
-  const clawsId = accTypeId('garras')
-  const glassId = accTypeId('anteojos')
-  const headId  = accTypeId('cabeza')
+  const clawsId  = accTypeId('garras')
+  const hocicoId = accTypeId('hocico')
+  const glassId  = accTypeId('anteojos')
+  const headId   = accTypeId('cabeza')
   const colors  = { primary, secondary, accent }
 
   // Refs para las extremidades — el RAF actualiza los atributos directamente
@@ -261,12 +262,14 @@ export default function TherianAvatarSVG({
             <g ref={lArmRef}>
               <ellipse cx={L_ARM_PX} cy="163" rx="13" ry="40" fill={fill}/>
               <ellipse cx="72" cy="201" rx="14" ry="11" fill={secondary} opacity="0.9"/>
+              {clawsId && CLAW_SIDE_SVG[clawsId]?.(colors, 'L')}
             </g>
 
             {/* Brazo derecho — pivot en hombro */}
             <g ref={rArmRef}>
               <ellipse cx={R_ARM_PX} cy="163" rx="13" ry="40" fill={fill}/>
               <ellipse cx="228" cy="201" rx="14" ry="11" fill={secondary} opacity="0.9"/>
+              {clawsId && CLAW_SIDE_SVG[clawsId]?.(colors, 'R')}
             </g>
 
             {/* Pierna izquierda — pivot en cadera */}
@@ -291,12 +294,11 @@ export default function TherianAvatarSVG({
 
         {/* Cuerpo */}
         <path d={BODY_SHAPE} fill={fill}/>
+        {/* Zona ventral — área secondary característica de los animales */}
+        <ellipse cx="150" cy="178" rx="35" ry="44" fill={secondary} opacity="0.42"/>
 
         {/* Patrón sobre cuerpo */}
         {PatternEl(primary, secondary)}
-
-        {/* Garras (sobre patas) */}
-        {showLimbs && clawsId && ACC_VISUAL_SVG[clawsId]?.(colors)}
 
         {/* Orejas — accesorio reemplaza las genéricas */}
         {earsId
@@ -314,8 +316,11 @@ export default function TherianAvatarSVG({
         {/* Cabeza */}
         <path d={HEAD_SHAPE} fill={fill}/>
 
-        {/* Nariz */}
-        <ellipse cx="150" cy="120" rx="8" ry="5" fill={accent} opacity="0.9"/>
+        {/* Hocico / Nariz */}
+        {hocicoId
+          ? ACC_VISUAL_SVG[hocicoId]?.(colors)
+          : <ellipse cx="150" cy="120" rx="8" ry="5" fill={accent} opacity="0.9"/>
+        }
 
         {/* Ojos */}
         <g transform="translate(120, 103)">

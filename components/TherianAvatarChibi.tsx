@@ -2,7 +2,7 @@
 
 import React, { useRef, useEffect } from 'react'
 import type { TherianDTO } from '@/lib/therian-dto'
-import { ACC_VISUAL_CHIBI } from '@/lib/items/accessory-visuals'
+import { ACC_VISUAL_CHIBI, CLAW_SIDE_CHIBI } from '@/lib/items/accessory-visuals'
 
 interface Props {
   therian: TherianDTO
@@ -150,9 +150,10 @@ export default function TherianAvatarChibi({
   const earsId  = accTypeId('orejas')
   const tailId  = accTypeId('cola')
   const eyesId  = accTypeId('ojos')
-  const clawsId = accTypeId('garras')
-  const glassId = accTypeId('anteojos')
-  const headId  = accTypeId('cabeza')
+  const clawsId  = accTypeId('garras')
+  const hocicoId = accTypeId('hocico')
+  const glassId  = accTypeId('anteojos')
+  const headId   = accTypeId('cabeza')
   const colors  = { primary, secondary, accent }
 
   const lArmRef    = useRef<SVGGElement>(null)
@@ -253,10 +254,12 @@ export default function TherianAvatarChibi({
           <ellipse cx="110" cy="212" rx="13" ry="29" fill={fill}/>
           {/* Paw — slightly wider rounded end */}
           <ellipse cx="109" cy="240" rx="14" ry="10" fill={secondary} opacity="0.88"/>
+          {clawsId && CLAW_SIDE_CHIBI[clawsId]?.(colors, 'L')}
         </g>
         <g ref={rArmRef}>
           <ellipse cx="190" cy="212" rx="13" ry="29" fill={fill}/>
           <ellipse cx="191" cy="240" rx="14" ry="10" fill={secondary} opacity="0.88"/>
+          {clawsId && CLAW_SIDE_CHIBI[clawsId]?.(colors, 'R')}
         </g>
 
         {/* ── Legs — short straight ovals, pivot at hip bottom ── */}
@@ -279,12 +282,11 @@ export default function TherianAvatarChibi({
 
         {/* ── Body — small pill/rounded-rect, like in the image ── */}
         <rect x="124" y="177" width="52" height="48" rx="22" fill={fill}/>
+        {/* Zona ventral */}
+        <ellipse cx="150" cy="197" rx="18" ry="22" fill={secondary} opacity="0.42"/>
 
         {/* Pattern over body */}
         {PatternEl(primary, secondary)}
-
-        {/* Garras (sobre patas) */}
-        {clawsId && ACC_VISUAL_CHIBI[clawsId]?.(colors)}
 
         {/* ── Ears — accesorio reemplaza las genéricas ── */}
         {earsId
@@ -302,8 +304,11 @@ export default function TherianAvatarChibi({
         {/* ── Head — large round oval, defining chibi shape ── */}
         <ellipse cx="150" cy="100" rx="82" ry="76" fill={fill}/>
 
-        {/* Nose */}
-        <ellipse cx="150" cy="118" rx="7" ry="5" fill={accent} opacity="0.85"/>
+        {/* Hocico / Nose */}
+        {hocicoId
+          ? ACC_VISUAL_CHIBI[hocicoId]?.(colors)
+          : <ellipse cx="150" cy="118" rx="7" ry="5" fill={accent} opacity="0.85"/>
+        }
 
         {/* Eyes — 1.35× scaled for chibi big-eye look */}
         <g transform="translate(114, 96) scale(1.35)">

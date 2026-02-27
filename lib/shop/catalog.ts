@@ -1,4 +1,4 @@
-export type ShopItemType = 'cosmetic' | 'service' | 'slot'
+export type ShopItemType = 'cosmetic' | 'service' | 'slot' | 'kit'
 
 export interface ShopItem {
   id: string
@@ -9,7 +9,8 @@ export interface ShopItem {
   costCoin: number
   type: ShopItemType
   accessoryId?: string
-  slot?: string // accessory slot ID (orejas | cola | ojos | cabeza | anteojos | garras)
+  slot?: string      // accessory slot ID (orejas | hocico | cola | ojos | cabeza | anteojos | garras)
+  includes?: string[] // kit: lista de accessoryIds incluidos
 }
 
 export const SHOP_ITEMS: ShopItem[] = [
@@ -85,6 +86,72 @@ export const SHOP_ITEMS: ShopItem[] = [
   { id: 'acc_claws_crow', name: 'Talones de Cuervo', emoji: '🪶', description: 'Talones de ave de cuervo.',                       costGold: 550, costCoin: 0, type: 'cosmetic', accessoryId: 'claws_crow', slot: 'garras' },
   { id: 'acc_claws_deer', name: 'Pezuñas de Ciervo', emoji: '🦌', description: 'Pezuñas divididas de ciervo.',                   costGold: 500, costCoin: 0, type: 'cosmetic', accessoryId: 'claws_deer', slot: 'garras' },
   { id: 'acc_claws_bear', name: 'Garras de Oso',     emoji: '🐻', description: '4 garras anchas y poderosas de oso.',             costGold: 550, costCoin: 0, type: 'cosmetic', accessoryId: 'claws_bear', slot: 'garras' },
+
+  // ── HOCICO ─────────────────────────────────────────────────────────────────
+  { id: 'acc_hocico_wolf', name: 'Hocico de Lobo',   emoji: '🐺', description: 'Morro alargado con nariz negra y boca de lobo.',  costGold: 550, costCoin: 0, type: 'cosmetic', accessoryId: 'hocico_wolf', slot: 'hocico' },
+  { id: 'acc_hocico_fox',  name: 'Hocico de Zorro',  emoji: '🦊', description: 'Morro puntiagudo y estrecho de zorro.',           costGold: 550, costCoin: 0, type: 'cosmetic', accessoryId: 'hocico_fox',  slot: 'hocico' },
+  { id: 'acc_hocico_cat',  name: 'Hocico de Gato',   emoji: '🐱', description: 'Nariz triangular, philtrum y bigotes de gato.',   costGold: 550, costCoin: 0, type: 'cosmetic', accessoryId: 'hocico_cat',  slot: 'hocico' },
+  { id: 'acc_hocico_bear', name: 'Hocico de Oso',    emoji: '🐻', description: 'Morro amplio y redondeado con gran nariz de oso.',costGold: 550, costCoin: 0, type: 'cosmetic', accessoryId: 'hocico_bear', slot: 'hocico' },
+  { id: 'acc_hocico_deer', name: 'Hocico de Ciervo', emoji: '🦌', description: 'Nariz delicada y labios etéreos de ciervo.',      costGold: 500, costCoin: 0, type: 'cosmetic', accessoryId: 'hocico_deer', slot: 'hocico' },
+  { id: 'acc_hocico_crow', name: 'Pico de Cuervo',   emoji: '🪶', description: 'Pico angular afilado de cuervo.',                 costGold: 550, costCoin: 0, type: 'cosmetic', accessoryId: 'hocico_crow', slot: 'hocico' },
+
+  // ── COLECCIONES DE ESPECIE (kits) ──────────────────────────────────────────
+  // Cada kit incluye orejas + hocico + cola + garras de la misma especie.
+  // Precio de kit < suma individual (~18% descuento).
+  {
+    id: 'kit_wolf',
+    name: 'Kit Lobo',
+    emoji: '🐺',
+    description: 'Orejas, hocico, cola y garras de lobo. Todo en uno con descuento.',
+    costGold: 1800, costCoin: 0,
+    type: 'kit',
+    includes: ['ears_wolf', 'hocico_wolf', 'tail_wolf', 'claws_wolf'],
+  },
+  {
+    id: 'kit_fox',
+    name: 'Kit Zorro',
+    emoji: '🦊',
+    description: 'Orejas, hocico, cola esponjosa y garras de zorro. Pack completo.',
+    costGold: 1900, costCoin: 0,
+    type: 'kit',
+    includes: ['ears_fox', 'hocico_fox', 'tail_fox', 'claws_fox'],
+  },
+  {
+    id: 'kit_cat',
+    name: 'Kit Gato',
+    emoji: '🐱',
+    description: 'Orejas, hocico con bigotes, cola curvada y garras retráctiles de gato.',
+    costGold: 1750, costCoin: 0,
+    type: 'kit',
+    includes: ['ears_cat', 'hocico_cat', 'tail_cat', 'claws_cat'],
+  },
+  {
+    id: 'kit_crow',
+    name: 'Kit Cuervo',
+    emoji: '🪶',
+    description: 'Cresta de plumas, pico, cola caudal y talones de cuervo.',
+    costGold: 1800, costCoin: 0,
+    type: 'kit',
+    includes: ['ears_crow', 'hocico_crow', 'tail_crow', 'claws_crow'],
+  },
+  {
+    id: 'kit_deer',
+    name: 'Kit Ciervo',
+    emoji: '🦌',
+    description: 'Orejas anchas, hocico etéreo, cola blanca y pezuñas de ciervo.',
+    costGold: 1600, costCoin: 0,
+    type: 'kit',
+    includes: ['ears_deer', 'hocico_deer', 'tail_deer', 'claws_deer'],
+  },
+  {
+    id: 'kit_bear',
+    name: 'Kit Oso',
+    emoji: '🐻',
+    description: 'Orejas redondas, gran hocico, cola y garras poderosas de oso.',
+    costGold: 1650, costCoin: 0,
+    type: 'kit',
+    includes: ['ears_bear', 'hocico_bear', 'tail_bear', 'claws_bear'],
+  },
 ]
 
 export function getShopItem(id: string): ShopItem | undefined {
