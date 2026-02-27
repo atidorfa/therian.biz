@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useRef, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import type { TherianDTO } from '@/lib/therian-dto'
@@ -273,45 +273,6 @@ export default function TherianCard({ therian: initialTherian, rank, slots = 1 }
       if (prev.length >= 3) return prev
       return [...prev, id]
     })
-  }
-
-  // Name editing
-  const [editingName, setEditingName] = useState(false)
-  const [nameInput, setNameInput] = useState(therian.name ?? '')
-  const [nameError, setNameError] = useState<string | null>(null)
-  const [nameSaving, setNameSaving] = useState(false)
-  const nameInputRef = useRef<HTMLInputElement>(null)
-
-  useEffect(() => {
-    if (editingName) nameInputRef.current?.focus()
-  }, [editingName])
-
-  const handleNameSave = async () => {
-    const trimmed = nameInput.trim()
-    if (trimmed === therian.name) { setEditingName(false); return }
-    setNameSaving(true)
-    setNameError(null)
-    try {
-      const res = await fetch('/api/therian/name', {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name: trimmed }),
-      })
-      const data = await res.json()
-      if (!res.ok) { setNameError(data.error ?? 'Error al guardar.'); return }
-      setTherian(prev => ({ ...prev, name: data.name }))
-      setNameInput(data.name)
-      setEditingName(false)
-    } catch {
-      setNameError('Error de conexión.')
-    } finally {
-      setNameSaving(false)
-    }
-  }
-
-  const handleNameKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter') handleNameSave()
-    if (e.key === 'Escape') { setEditingName(false); setNameInput(therian.name ?? ''); setNameError(null) }
   }
 
   const handleBiteSearch = async (e: React.FormEvent) => {
@@ -732,61 +693,10 @@ export default function TherianCard({ therian: initialTherian, rank, slots = 1 }
         {/* Header */}
         <div className="flex items-start justify-between">
           <div className="flex-1 min-w-0 pr-3">
-            {/* Nombre editable */}
-            {editingName ? (
-              <div className="mb-2 space-y-1.5">
-                <p className="text-[#8B84B0] text-[10px] uppercase tracking-widest">Nombrando tu Therian...</p>
-                <div className="flex items-center gap-2">
-                  <div className="relative flex-1">
-                    <input
-                      ref={nameInputRef}
-                      value={nameInput}
-                      onChange={e => { setNameInput(e.target.value); setNameError(null) }}
-                      onKeyDown={handleNameKeyDown}
-                      maxLength={24}
-                      disabled={nameSaving}
-                      className="w-full bg-white/5 border border-purple-500/50 rounded-xl px-3 py-1.5 text-sm text-white outline-none focus:border-purple-400 focus:bg-purple-950/20 transition-all disabled:opacity-50 placeholder-white/20"
-                      placeholder="Elige un nombre..."
-                      style={{ boxShadow: '0 0 0 0 transparent' }}
-                      onFocus={e => (e.target.style.boxShadow = '0 0 14px rgba(168,85,247,0.25)')}
-                      onBlur={e => (e.target.style.boxShadow = '0 0 0 0 transparent')}
-                    />
-                    <span className="absolute right-3 top-1/2 -translate-y-1/2 text-white/20 text-xs">
-                      {nameInput.length}/24
-                    </span>
-                  </div>
-                  <button
-                    onClick={handleNameSave}
-                    disabled={nameSaving || nameInput.trim().length < 2}
-                    className="px-3 py-1.5 rounded-xl bg-purple-600 hover:bg-purple-500 disabled:opacity-30 disabled:cursor-not-allowed text-white text-sm font-semibold transition-colors"
-                  >
-                    {nameSaving ? '···' : 'Guardar'}
-                  </button>
-                  <button
-                    onClick={() => { setEditingName(false); setNameInput(therian.name ?? ''); setNameError(null) }}
-                    className="px-2.5 py-1.5 rounded-xl border border-white/10 text-white/40 hover:text-white/70 hover:border-white/20 text-sm transition-colors"
-                  >
-                    ✕
-                  </button>
-                </div>
-                {nameError ? (
-                  <p className="text-red-400 text-xs pl-1">{nameError}</p>
-                ) : (
-                  <p className="text-white/20 text-xs pl-1">Enter para guardar · Esc para cancelar</p>
-                )}
-              </div>
-            ) : (
-              <button
-                onClick={() => setEditingName(true)}
-                className="group flex items-center gap-1.5 mb-0.5"
-                title="Cambiar nombre"
-              >
-                <span className="text-2xl font-bold text-white">
-                  {therian.name ?? 'Sin nombre'}
-                </span>
-                <span className="opacity-0 group-hover:opacity-60 text-purple-400 text-xs transition-opacity">✎</span>
-              </button>
-            )}
+            {/* Nombre */}
+            <p className="text-2xl font-bold text-white mb-0.5">
+              {therian.name ?? 'Sin nombre'}
+            </p>
             <div className="flex flex-wrap items-center gap-x-3 gap-y-1 mt-2">
               <p className="text-[#8B84B0] text-xs">🦷 {therian.bites} mordidas</p>
               {rank !== undefined && (
