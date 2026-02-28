@@ -13,6 +13,9 @@ interface LeaderboardEntry {
   species: { id: string; name: string; emoji: string }
   rarity: string
   bites: number
+  deaths?: number
+  level?: number
+  xp?: number
   appearance: {
     paletteColors: { primary: string; secondary: string; accent: string }
   }
@@ -22,7 +25,9 @@ interface LeaderboardEntry {
 
 interface Props {
   entries: LeaderboardEntry[]
+  entriesLevel?: LeaderboardEntry[]
   userRank: number | null
+  userRankLevel?: number | null
 }
 
 const RARITY_LABEL: Record<string, string> = {
@@ -186,80 +191,157 @@ function ProfileModal({
   )
 }
 
-export default function LeaderboardTable({ entries, userRank }: Props) {
-  const [selected, setSelected] = useState<LeaderboardEntry | null>(null)
-
+function EntryList({
+  entries,
+  mode,
+  activeRank,
+  onSelect,
+}: {
+  entries: LeaderboardEntry[]
+  mode: 'bites' | 'level'
+  activeRank: number | null
+  onSelect: (e: LeaderboardEntry) => void
+}) {
   if (entries.length === 0) {
     return (
       <div className="text-center text-[#8B84B0] italic py-8">
-        Aún no hay batallas. ¡Sé el primero en morder!
+        {mode === 'bites' ? 'Aún no hay batallas. ¡Sé el primero en morder!' : 'Aún no hay Therians con nivel.'}
       </div>
     )
   }
 
   return (
-    <>
-      <div className="space-y-3">
-        {entries.map((entry) => (
-          <button
-            key={entry.id}
-            onClick={() => entry.name && setSelected(entry)}
-            className="w-full flex items-center gap-3 rounded-xl border border-white/5 bg-[#13131F] px-4 py-3 hover:bg-[#1A1A2E] hover:border-white/10 transition-colors text-left"
-            style={{
-              boxShadow: entry.rank <= 3 ? `0 0 16px ${entry.appearance.paletteColors.primary}22` : undefined,
-            }}
-          >
-            {/* Rank */}
-            <div className="w-8 text-center flex-shrink-0">
-              {RANK_MEDAL[entry.rank] ?? (
-                <span className="text-[#4A4468] font-mono text-sm">#{entry.rank}</span>
-              )}
-            </div>
-
-            {/* Color accent bar */}
-            <div
-              className="w-1 h-10 rounded-full flex-shrink-0"
-              style={{ background: entry.appearance.paletteColors.primary }}
-            />
-
-            {/* Info */}
-            <div className="flex-1 min-w-0">
-              <div className="flex items-center gap-2">
-                <span className="text-white font-bold truncate">{entry.name}</span>
-                <span className={`text-xs font-semibold ${RARITY_COLOR[entry.rarity] ?? 'text-slate-400'}`}>
-                  {RARITY_LABEL[entry.rarity] ?? entry.rarity}
-                </span>
-              </div>
-              <div className="text-[#8B84B0] text-xs flex items-center gap-1.5">
-                {entry.ownerId && entry.ownerName && (
-                  <>
-                    <span className="text-white/15">·</span>
-                    <Link
-                      href={`/user/${entry.ownerId}`}
-                      onClick={e => e.stopPropagation()}
-                      className="text-purple-400/70 hover:text-purple-300 transition-colors"
-                    >
-                      @{entry.ownerName}
-                    </Link>
-                  </>
-                )}
-              </div>
-            </div>
-
-            {/* Bites */}
-            <div className="flex items-center gap-1 flex-shrink-0">
-              <span className="text-white font-bold font-mono text-lg">{entry.bites}</span>
-              <span className="text-base">🦷</span>
-            </div>
-          </button>
-        ))}
-
-        {userRank !== null && userRank > entries.length && (
-          <div className="text-center text-[#8B84B0] text-sm pt-2 italic">
-            Tu posición global: <span className="text-white font-bold">#{userRank}</span>
+    <div className="space-y-3">
+      {entries.map((entry) => (
+        <button
+          key={entry.id}
+          onClick={() => entry.name && onSelect(entry)}
+          className="w-full flex items-center gap-3 rounded-xl border border-white/5 bg-[#13131F] px-4 py-3 hover:bg-[#1A1A2E] hover:border-white/10 transition-colors text-left"
+          style={{
+            boxShadow: entry.rank <= 3 ? `0 0 16px ${entry.appearance.paletteColors.primary}22` : undefined,
+          }}
+        >
+          {/* Rank */}
+          <div className="w-8 text-center flex-shrink-0">
+            {RANK_MEDAL[entry.rank] ?? (
+              <span className="text-[#4A4468] font-mono text-sm">#{entry.rank}</span>
+            )}
           </div>
-        )}
-      </div>
+
+          {/* Color accent bar */}
+          <div
+            className="w-1 h-10 rounded-full flex-shrink-0"
+            style={{ background: entry.appearance.paletteColors.primary }}
+          />
+
+          {/* Info */}
+          <div className="flex-1 min-w-0">
+            {mode === 'level' ? (
+              <span className="text-white font-bold truncate block">
+                {entry.ownerName}
+              </span>
+            ) : (
+              <>
+                <div className="flex items-center gap-2">
+                  <span className="text-white font-bold truncate">{entry.name}</span>
+                  <span className={`text-xs font-semibold ${RARITY_COLOR[entry.rarity] ?? 'text-slate-400'}`}>
+                    {RARITY_LABEL[entry.rarity] ?? entry.rarity}
+                  </span>
+                </div>
+                <div className="text-[#8B84B0] text-xs flex items-center gap-1.5">
+                  {entry.ownerId && entry.ownerName && (
+                    <>
+                      <span className="text-white/15">·</span>
+                      <Link
+                        href={`/user/${entry.ownerId}`}
+                        onClick={e => e.stopPropagation()}
+                        className="text-purple-400/70 hover:text-purple-300 transition-colors"
+                      >
+                        @{entry.ownerName}
+                      </Link>
+                    </>
+                  )}
+                </div>
+              </>
+            )}
+          </div>
+
+          {/* Metric */}
+          {mode === 'bites' ? (() => {
+            const deaths = entry.deaths ?? 0
+            const total = entry.bites + deaths
+            const wr = total > 0 ? Math.round((entry.bites / total) * 100) : null
+            return (
+              <div className="text-right flex-shrink-0">
+                <div className="flex items-center gap-1.5 justify-end">
+                  <span className="text-white font-bold font-mono text-base">{entry.bites}</span>
+                  <span className="text-sm">🦷</span>
+                  <span className="text-white/30 font-mono text-xs">·</span>
+                  <span className="text-white/50 font-mono text-base">{deaths}</span>
+                  <span className="text-sm">💀</span>
+                </div>
+                <div className="text-[#8B84B0] font-mono text-xs text-right">
+                  {wr !== null ? `${wr}% WR` : '—'}
+                </div>
+              </div>
+            )
+          })() : (
+            <div className="text-right flex-shrink-0">
+              <div className="text-white font-bold font-mono text-lg leading-none">Lv.{entry.level ?? 1}</div>
+              <div className="text-[#8B84B0] font-mono text-xs">{entry.xp ?? 0} XP</div>
+            </div>
+          )}
+        </button>
+      ))}
+
+      {activeRank !== null && activeRank > entries.length && (
+        <div className="text-center text-[#8B84B0] text-sm pt-2 italic">
+          Tu posición global: <span className="text-white font-bold">#{activeRank}</span>
+        </div>
+      )}
+    </div>
+  )
+}
+
+export default function LeaderboardTable({ entries, entriesLevel, userRank, userRankLevel }: Props) {
+  const [selected, setSelected] = useState<LeaderboardEntry | null>(null)
+  const [tab, setTab] = useState<'bites' | 'level'>('bites')
+
+  const hasLevelTab = entriesLevel !== undefined
+
+  return (
+    <>
+      {hasLevelTab && (
+        <div className="flex rounded-xl border border-white/8 bg-white/3 p-1 gap-1">
+          <button
+            onClick={() => setTab('bites')}
+            className={`flex-1 py-2 rounded-lg text-sm font-semibold transition-colors ${
+              tab === 'bites'
+                ? 'bg-amber-500/15 text-amber-300 border border-amber-500/30'
+                : 'text-white/30 hover:text-white/60'
+            }`}
+          >
+            🦷 Mordidas
+          </button>
+          <button
+            onClick={() => setTab('level')}
+            className={`flex-1 py-2 rounded-lg text-sm font-semibold transition-colors ${
+              tab === 'level'
+                ? 'bg-purple-500/15 text-purple-300 border border-purple-500/30'
+                : 'text-white/30 hover:text-white/60'
+            }`}
+          >
+            ✨ Nivel
+          </button>
+        </div>
+      )}
+
+      <EntryList
+        entries={tab === 'bites' ? entries : (entriesLevel ?? [])}
+        mode={tab}
+        activeRank={tab === 'bites' ? userRank : (userRankLevel ?? null)}
+        onSelect={setSelected}
+      />
 
       {selected && (
         <ProfileModal entry={selected} onClose={() => setSelected(null)} />

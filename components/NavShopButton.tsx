@@ -19,10 +19,11 @@ export default function NavShopButton({ therian: initialTherian }: Props) {
   const [showShop, setShowShop] = useState(false)
   const [wallet, setWallet] = useState<Wallet | null>(null)
   const [localTherian, setLocalTherian] = useState(initialTherian)
-  const [initialTab, setInitialTab] = useState<'gold' | 'coin'>('gold')
+  const [therians, setTherians] = useState<TherianDTO[]>([initialTherian])
+  const [initialTab, setInitialTab] = useState<'huevos' | 'accesorios' | 'runas' | 'cuenta'>('accesorios')
   const [highlightItem, setHighlightItem] = useState<string | undefined>(undefined)
 
-  const openShop = (tab: 'gold' | 'coin' = 'gold', highlight?: string) => {
+  const openShop = (tab: 'huevos' | 'accesorios' | 'runas' | 'cuenta' = 'accesorios', highlight?: string) => {
     setInitialTab(tab)
     setHighlightItem(highlight)
     setShowShop(true)
@@ -32,12 +33,16 @@ export default function NavShopButton({ therian: initialTherian }: Props) {
         .then(data => { if (data) setWallet(data) })
         .catch(() => {})
     }
+    fetch('/api/therians/mine')
+      .then(r => r.ok ? r.json() : null)
+      .then(data => { if (Array.isArray(data) && data.length > 0) setTherians(data) })
+      .catch(() => {})
   }
 
   useEffect(() => {
     const handler = (e: Event) => {
-      const detail = (e as CustomEvent<{ tab?: 'gold' | 'coin'; highlight?: string }>).detail
-      openShop(detail?.tab ?? 'gold', detail?.highlight)
+      const detail = (e as CustomEvent<{ tab?: 'huevos' | 'accesorios' | 'runas' | 'cuenta'; highlight?: string }>).detail
+      openShop(detail?.tab ?? 'accesorios', detail?.highlight)
     }
     window.addEventListener('open-shop', handler)
     return () => window.removeEventListener('open-shop', handler)
@@ -56,6 +61,7 @@ export default function NavShopButton({ therian: initialTherian }: Props) {
         wallet ? (
           <ShopModal
             therian={localTherian}
+            therians={therians}
             wallet={wallet}
             initialTab={initialTab}
             highlightItem={highlightItem}
