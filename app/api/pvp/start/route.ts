@@ -113,7 +113,7 @@ export async function POST(req: NextRequest) {
           pattern:   appearance.pattern,
           signature: appearance.signature,
         },
-        level:  (t as any).level ?? 1,
+        level:  1,
         rarity: t.rarity,
       },
     }

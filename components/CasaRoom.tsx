@@ -9,6 +9,7 @@ import TherianAvatar from './TherianAvatar'
 
 interface Props {
   therian: TherianDTO
+  userLevel: number
 }
 
 const SPEED_PX_PER_SEC = 180
@@ -17,7 +18,7 @@ const X_MARGIN_RIGHT = 120
 const JUMP_HEIGHT = 110        // px, how high the character rises
 const JUMP_DURATION = 0.52     // seconds for the full parabolic arc
 
-export default function CasaRoom({ therian }: Props) {
+export default function CasaRoom({ therian, userLevel }: Props) {
   const router = useRouter()
 
   // Position stored in a ref for the game loop, mirrored to state for rendering
@@ -361,7 +362,7 @@ export default function CasaRoom({ therian }: Props) {
         <div className="flex items-center gap-2">
           <span className="text-white font-semibold text-sm">{therian.name ?? 'Sin nombre'}</span>
           <span className="text-white/30 text-xs">·</span>
-          <span className="text-white/40 text-xs">Nv {therian.level}</span>
+          <span className="text-white/40 text-xs">Nv {userLevel}</span>
           <span className="text-white/30 text-xs">·</span>
           <span className="text-white/40 text-xs">{therian.species.emoji} {therian.species.name}</span>
         </div>

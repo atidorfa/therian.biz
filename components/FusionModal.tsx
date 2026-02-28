@@ -415,7 +415,7 @@ export default function FusionModal({ therians, inventory, onClose, onSuccess }:
                             <TherianAvatar therian={t} size={36} animated={false} />
                             <div className="flex-1 min-w-0">
                               <p className="text-white text-xs font-semibold truncate leading-tight">{t.name ?? 'Sin nombre'}</p>
-                              <p className={`text-[10px] font-semibold ${RARITY_COLOR[t.rarity]}`}>Nv {t.level}</p>
+                              <p className={`text-[10px] font-semibold ${RARITY_COLOR[t.rarity]}`}>{RARITY_LABEL[t.rarity]}</p>
                             </div>
                             {isSelected && <span className="text-[10px] text-white/30 flex-shrink-0">en slot</span>}
                           </button>

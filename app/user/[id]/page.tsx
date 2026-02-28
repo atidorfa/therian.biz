@@ -89,7 +89,7 @@ export default async function UserProfilePage({ params }: { params: Promise<{ id
                     </span>
                   </div>
                   <div className="text-[#8B84B0] text-xs">
-                    Nv {t.level} · {t.bites} 🦷
+                    {t.bites} 🦷
                   </div>
                 </div>
                 <RarityBadge rarity={t.rarity} size="sm" />

@@ -13,6 +13,16 @@ export default async function CasaPage() {
     redirect('/login')
   }
 
+  const user = await db.user.findUnique({
+    where: { id: session.user.id },
+    select: { level: true },
+  })
+
+  // La Casa solo está disponible para usuarios nivel 2+
+  if (!user || user.level < 2) {
+    redirect('/therian')
+  }
+
   const therian = await db.therian.findFirst({
     where: { userId: session.user.id },
   })
@@ -23,10 +33,5 @@ export default async function CasaPage() {
 
   const dto = toTherianDTO(therian)
 
-  // La Casa solo está disponible para Therians evolucionados (nivel 2+)
-  if (dto.level < 2) {
-    redirect('/therian')
-  }
-
-  return <CasaRoom therian={dto} />
+  return <CasaRoom therian={dto} userLevel={user.level} />
 }

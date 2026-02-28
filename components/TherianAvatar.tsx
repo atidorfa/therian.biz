@@ -19,19 +19,14 @@ export default function TherianAvatar({
   isWalking,
   isJumping,
 }: Props) {
-  // Level 3+: chibi egg-head form (fully animated SVG)
-  if (therian.level >= 3) {
-    return (
-      <TherianAvatarChibi
-        therian={therian}
-        size={size}
-        animated={animated}
-        isWalking={isWalking}
-        isJumping={isJumping}
-      />
-    )
-  }
-
-  // Level 1–2: simple blob SVG, no limbs
-  return <TherianAvatarSVG therian={therian} size={size} animated={animated} />
+  // Always use chibi form (animated SVG with limbs)
+  return (
+    <TherianAvatarChibi
+      therian={therian}
+      size={size}
+      animated={animated}
+      isWalking={isWalking}
+      isJumping={isJumping}
+    />
+  )
 }

@@ -6,6 +6,7 @@ import TherianAvatar from '@/components/TherianAvatar'
 import StatBar from '@/components/StatBar'
 import RarityBadge from '@/components/RarityBadge'
 import { getSession } from '@/lib/session'
+import { xpToNextLevel } from '@/lib/therian-dto'
 
 export const dynamic = 'force-dynamic'
 
@@ -41,18 +42,24 @@ export default async function TherianProfilePage({
 
   const dto = toTherianDTO(therian)
 
+  // Fetch owner's level/xp from User model
+  const owner = await db.user.findUnique({
+    where: { id: therian.userId },
+    select: { level: true, xp: true },
+  })
+  const ownerLevel = owner?.level ?? 1
+  const ownerXp = owner?.xp ?? 0
+  const ownerXpToNext = xpToNextLevel(ownerLevel)
+
   const aboveCount = await db.therian.count({
     where: {
-      OR: [
-        { bites: { gt: therian.bites } },
-        { bites: therian.bites, level: { gt: therian.level } },
-      ],
+      bites: { gt: therian.bites },
     },
   })
   const rank = aboveCount + 1
 
   const isOwner = session?.user?.id === therian.userId
-  const xpPct = Math.min(100, (dto.xp / dto.xpToNext) * 100)
+  const xpPct = Math.min(100, (ownerXp / ownerXpToNext) * 100)
   const glowClass = RARITY_GLOW[dto.rarity] ?? RARITY_GLOW.COMMON
 
   return (
@@ -94,7 +101,7 @@ export default async function TherianProfilePage({
               <div className="flex-1 min-w-0 pr-3">
                 <h1 className="text-2xl font-bold text-white">{dto.name}</h1>
                 <div className="flex flex-wrap items-center gap-x-3 gap-y-1 mt-2">
-                  <p className="text-[#8B84B0] text-xs">🔰 Nivel {dto.level}</p>
+                  <p className="text-[#8B84B0] text-xs">🔰 Nivel {ownerLevel}</p>
                   <p className="text-[#8B84B0] text-xs">🦷 {dto.bites} mordidas</p>
                   <p className="text-[#8B84B0] text-xs">🏆 #{rank}</p>
                 </div>
@@ -134,7 +141,7 @@ export default async function TherianProfilePage({
             <div className="space-y-1">
               <div className="flex justify-between text-xs text-[#8B84B0]">
                 <span>XP</span>
-                <span className="font-mono">{dto.xp} / {dto.xpToNext}</span>
+                <span className="font-mono">{ownerXp} / {ownerXpToNext}</span>
               </div>
               <div className="h-1.5 bg-white/5 rounded-full overflow-hidden">
                 <div
